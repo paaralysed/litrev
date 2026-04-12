@@ -116,6 +116,9 @@ body.dark #topbar { background:rgba(11,18,32,0.88); }
   color:var(--blue);letter-spacing:-0.02em;line-height:1;margin-bottom:0.75rem;
 }
 .home-logo em{font-style:italic;color:var(--text);}
+.home-logomark{margin:0.5rem auto 1.25rem;opacity:0.9;}
+body.dark .home-logomark svg [fill="#2e7dd1"]{fill:#4d9de0 !important;}
+body.dark .home-logomark svg [stroke="#2e7dd1"]{stroke:#4d9de0 !important;}
 .home-tagline{
   font-size:1.05rem;color:var(--muted);font-weight:300;
   line-height:1.65;margin-bottom:2.5rem;max-width:420px;margin-left:auto;margin-right:auto;
@@ -303,6 +306,32 @@ body.dark #topbar { background:rgba(11,18,32,0.88); }
   <div id="view-home" class="view active">
     <div class="home-hero">
       <div class="home-logo">Lit<em>Rev</em></div>
+      <div class="home-logomark">
+        <svg width="120" height="72" viewBox="0 0 120 72" role="img" xmlns="http://www.w3.org/2000/svg">
+          <title>LitRev open book logo</title>
+          <!-- left page -->
+          <path d="M60 14 Q38 10 12 16 L12 58 Q36 52 60 58 Z" fill="#2e7dd1" opacity="0.18"/>
+          <path d="M60 14 Q38 10 12 16 L12 58 Q36 52 60 58 Z" fill="none" stroke="#2e7dd1" stroke-width="1.2" opacity="0.6"/>
+          <!-- right page -->
+          <path d="M60 14 Q82 10 108 16 L108 58 Q84 52 60 58 Z" fill="#2e7dd1" opacity="0.1"/>
+          <path d="M60 14 Q82 10 108 16 L108 58 Q84 52 60 58 Z" fill="none" stroke="#2e7dd1" stroke-width="1.2" opacity="0.4"/>
+          <!-- spine -->
+          <line x1="60" y1="14" x2="60" y2="58" stroke="#2e7dd1" stroke-width="1.5" opacity="0.7"/>
+          <!-- left page lines -->
+          <line x1="22" y1="28" x2="52" y2="25" stroke="#2e7dd1" stroke-width="0.8" opacity="0.4"/>
+          <line x1="22" y1="34" x2="52" y2="31" stroke="#2e7dd1" stroke-width="0.8" opacity="0.4"/>
+          <line x1="22" y1="40" x2="52" y2="38" stroke="#2e7dd1" stroke-width="0.8" opacity="0.3"/>
+          <line x1="22" y1="46" x2="48" y2="44" stroke="#2e7dd1" stroke-width="0.8" opacity="0.25"/>
+          <!-- right page lines -->
+          <line x1="68" y1="25" x2="98" y2="28" stroke="#2e7dd1" stroke-width="0.8" opacity="0.3"/>
+          <line x1="68" y1="31" x2="98" y2="34" stroke="#2e7dd1" stroke-width="0.8" opacity="0.3"/>
+          <line x1="68" y1="38" x2="98" y2="40" stroke="#2e7dd1" stroke-width="0.8" opacity="0.22"/>
+          <!-- bookmark ribbon on right page -->
+          <path d="M90 10 L90 30 L87 27 L84 30 L84 10 Z" fill="#2e7dd1" opacity="0.55"/>
+          <!-- shadow base -->
+          <ellipse cx="60" cy="61" rx="38" ry="4" fill="#2e7dd1" opacity="0.08"/>
+        </svg>
+      </div>
       <p class="home-tagline">A focused revision platform for GCSE English Literature — quotes, analysis, context, and interactive study tools.</p>
       <div class="home-cards">
         <div class="home-card" onclick="navMode('flashcards','poems')">
