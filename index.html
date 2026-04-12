@@ -3,241 +3,379 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>LitRev — Revision</title>
+<title>LitRev</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400;1,600&family=Karla:wght@300;400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=DM+Serif+Display:ital@0;1&display=swap" rel="stylesheet">
 <style>
 :root {
-  --bg:#0f0e0c;--bg2:#1a1814;--bg3:#242018;--surface:#2a261f;
-  --border:rgba(255,255,255,0.08);--border2:rgba(255,255,255,0.15);
-  --text:#e8e0d0;--muted:#8a8070;--faint:#4a4438;
-  --gold:#c9a84c;--gold2:#e8c878;--cream:#f0e8d8;
-  --red:#c85050;--green:#5a9a6a;
+  --bg:#f4f8ff;--bg2:#ffffff;--bg3:#eaf2ff;--surface:#ddeaf8;
+  --border:rgba(99,155,220,0.15);--border2:rgba(99,155,220,0.3);
+  --text:#0f1f30;--muted:#5a7a9a;--faint:#b8d0e8;
+  --blue:#2e7dd1;--blue2:#1a5fa8;--bluelight:#e8f3ff;
+  --red:#d04040;--green:#2a8a50;
+  --sidebar-w:260px;
+}
+body.dark {
+  --bg:#0c1220;--bg2:#111827;--bg3:#161e2e;--surface:#1c2540;
+  --border:rgba(99,155,220,0.1);--border2:rgba(99,155,220,0.22);
+  --text:#d0dff0;--muted:#6888a8;--faint:#1e2e40;
+  --blue:#4d9de0;--blue2:#6ab0f0;--bluelight:#0f1e30;
+  --red:#e07070;--green:#4aaa70;
 }
 *{box-sizing:border-box;margin:0;padding:0;}
-body{font-family:'Karla',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;font-size:15px;line-height:1.6;}
+body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;font-size:14px;line-height:1.6;overflow-x:hidden;}
 
-/* NAV */
-nav{position:sticky;top:0;z-index:100;background:var(--bg2);border-bottom:1px solid var(--border);}
-.nav-top{display:flex;align-items:center;padding:0 1.5rem;height:52px;gap:0.25rem;}
-.nav-logo{font-family:'Cormorant Garamond',serif;font-size:1.25rem;color:var(--gold);margin-right:auto;letter-spacing:0.05em;}
-.nav-logo em{font-style:italic;color:var(--cream);}
-.nav-btn{background:none;border:none;color:var(--muted);font-family:'Karla',sans-serif;font-size:0.78rem;font-weight:500;text-transform:uppercase;letter-spacing:0.08em;padding:6px 12px;border-radius:4px;cursor:pointer;transition:all 0.15s;}
-.nav-btn:hover{color:var(--text);background:var(--surface);}
-.nav-btn.active{color:var(--gold);}
+/* ── TOPBAR ── */
+#topbar {
+  position:fixed;top:0;left:0;right:0;height:52px;z-index:200;
+  background:rgba(255,255,255,0.82);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);
+  border-bottom:1px solid var(--border);
+  display:flex;align-items:center;padding:0 1.25rem;gap:0.75rem;
+}
+body.dark #topbar { background:rgba(11,18,32,0.88); }
+.topbar-logo {
+  font-family:'DM Serif Display',serif;font-size:1.2rem;color:var(--blue);
+  letter-spacing:0.01em;text-decoration:none;cursor:pointer;
+  display:flex;align-items:center;gap:6px;
+}
+.topbar-logo em{font-style:italic;color:var(--text);}
+.topbar-spacer{flex:1;}
+.icon-btn {
+  width:34px;height:34px;border-radius:8px;border:1px solid var(--border2);
+  background:none;cursor:pointer;display:flex;align-items:center;justify-content:center;
+  font-size:14px;color:var(--muted);transition:all 0.15s;
+}
+.icon-btn:hover{background:var(--bg3);color:var(--text);}
+.hamburger{flex-direction:column;gap:4px;padding:8px;}
+.hamburger span{display:block;width:16px;height:1.5px;background:var(--muted);border-radius:2px;transition:all 0.2s;}
 
-/* CATEGORY BAR */
-.cat-bar{display:flex;border-top:1px solid var(--border);padding:0 1.5rem;}
-.cat-btn{background:none;border:none;border-bottom:2px solid transparent;color:var(--muted);font-family:'Karla',sans-serif;font-size:0.8rem;font-weight:500;letter-spacing:0.06em;padding:10px 16px;cursor:pointer;transition:all 0.15s;text-transform:uppercase;}
-.cat-btn:hover{color:var(--text);}
-.cat-btn.active{color:var(--cream);border-bottom-color:var(--gold);}
+/* ── SIDEBAR ── */
+#sidebar {
+  position:fixed;top:52px;left:0;bottom:0;width:var(--sidebar-w);
+  background:var(--bg2);border-right:1px solid var(--border);
+  z-index:150;overflow-y:auto;
+  transform:translateX(-100%);transition:transform 0.25s cubic-bezier(.4,0,.2,1);
+  padding:1.25rem 0 2rem;
+}
+#sidebar.open{transform:translateX(0);}
+#sidebar-overlay {
+  display:none;position:fixed;inset:0;top:52px;background:rgba(0,0,0,0.18);
+  z-index:140;backdrop-filter:blur(2px);
+}
+#sidebar-overlay.show{display:block;}
 
-/* VIEWS */
-.view{display:none;max-width:900px;margin:0 auto;padding:2.5rem 1.5rem;}
+.sb-section{padding:0.25rem 0 0.75rem;}
+.sb-label{font-size:0.65rem;font-weight:600;text-transform:uppercase;letter-spacing:0.1em;color:var(--faint);padding:0 1.25rem;margin-bottom:0.25rem;display:block;}
+.sb-item {
+  display:flex;align-items:center;gap:10px;width:100%;
+  padding:0.55rem 1.25rem;background:none;border:none;
+  font-family:'Inter',sans-serif;font-size:0.82rem;font-weight:400;
+  color:var(--muted);cursor:pointer;transition:all 0.12s;text-align:left;
+  border-radius:0;
+}
+.sb-item:hover{color:var(--text);background:var(--bg3);}
+.sb-item.active{color:var(--blue);background:var(--bluelight);font-weight:500;}
+.sb-item .sb-icon{font-size:13px;width:18px;text-align:center;flex-shrink:0;}
+.sb-divider{height:1px;background:var(--border);margin:0.5rem 1.25rem;}
+.sb-cat-toggle {
+  display:flex;align-items:center;gap:8px;width:100%;
+  padding:0.45rem 1.25rem;background:none;border:none;
+  font-family:'Inter',sans-serif;font-size:0.7rem;font-weight:600;
+  text-transform:uppercase;letter-spacing:0.08em;
+  color:var(--muted);cursor:pointer;transition:color 0.12s;
+  border-radius:0;
+}
+.sb-cat-toggle:hover{color:var(--text);}
+.sb-cat-toggle .arrow{font-size:9px;margin-left:auto;transition:transform 0.2s;}
+.sb-cat-toggle.collapsed .arrow{transform:rotate(-90deg);}
+.sb-cat-body{overflow:hidden;transition:max-height 0.25s ease;}
+
+/* ── MAIN CONTENT ── */
+#main {
+  margin-top:52px;
+  min-height:calc(100vh - 52px);
+  transition:margin-left 0.25s cubic-bezier(.4,0,.2,1);
+}
+
+/* ── VIEWS ── */
+.view{display:none;max-width:820px;margin:0 auto;padding:2.5rem 1.75rem;}
 .view.active{display:block;}
 
-/* PAGE HEADER */
-.page-header{margin-bottom:2rem;}
-.page-header h1{font-family:'Cormorant Garamond',serif;font-size:2.2rem;font-weight:600;color:var(--cream);margin-bottom:0.25rem;}
-.page-header p{color:var(--muted);font-size:0.88rem;}
+/* ── HOME ── */
+#view-home {
+  display:none;
+  max-width:100%;padding:0;margin:0;
+  min-height:calc(100vh - 52px);
+  flex-direction:column;align-items:center;justify-content:center;
+  background:var(--bg);
+}
+#view-home.active{display:flex;}
+.home-hero{text-align:center;padding:3rem 2rem 2.5rem;max-width:580px;}
+.home-logo{
+  font-family:'DM Serif Display',serif;font-size:4rem;
+  color:var(--blue);letter-spacing:-0.02em;line-height:1;margin-bottom:0.75rem;
+}
+.home-logo em{font-style:italic;color:var(--text);}
+.home-tagline{
+  font-size:1.05rem;color:var(--muted);font-weight:300;
+  line-height:1.65;margin-bottom:2.5rem;max-width:420px;margin-left:auto;margin-right:auto;
+}
+.home-cards{display:grid;grid-template-columns:repeat(2,1fr);gap:0.85rem;width:100%;max-width:520px;margin-bottom:2rem;}
+.home-card{
+  background:var(--bg2);border:1px solid var(--border);border-radius:12px;
+  padding:1.1rem 1.25rem;cursor:pointer;transition:all 0.18s;text-align:left;
+  position:relative;overflow:hidden;
+}
+.home-card::after{content:'';position:absolute;inset:0;border-radius:12px;background:var(--blue);opacity:0;transition:opacity 0.18s;}
+.home-card:hover{border-color:var(--border2);box-shadow:0 4px 20px rgba(46,125,209,0.12);transform:translateY(-1px);}
+.home-card:hover::after{opacity:0.03;}
+.home-card-icon{font-size:1.1rem;margin-bottom:0.5rem;display:block;}
+.home-card-title{font-size:0.82rem;font-weight:600;color:var(--text);margin-bottom:0.15rem;}
+.home-card-sub{font-size:0.72rem;color:var(--muted);}
+.home-start-btn{
+  display:inline-flex;align-items:center;gap:8px;
+  background:var(--blue);color:#fff;border:none;
+  font-family:'Inter',sans-serif;font-size:0.85rem;font-weight:500;
+  padding:10px 24px;border-radius:8px;cursor:pointer;
+  transition:all 0.15s;letter-spacing:0.01em;
+}
+.home-start-btn:hover{background:var(--blue2);transform:translateY(-1px);}
+.home-footer{font-size:0.72rem;color:var(--faint);margin-top:1.25rem;}
 
-/* TABS */
-.tabs{display:flex;flex-wrap:wrap;gap:0.4rem;margin-bottom:2rem;}
-.tab{background:var(--bg3);border:1px solid var(--border);color:var(--muted);font-family:'Karla',sans-serif;font-size:0.78rem;padding:5px 14px;border-radius:20px;cursor:pointer;transition:all 0.15s;font-weight:500;}
+/* ── PAGE HEADER ── */
+.page-header{margin-bottom:1.75rem;}
+.page-header h1{font-family:'DM Serif Display',serif;font-size:1.75rem;font-weight:400;color:var(--text);margin-bottom:0.2rem;}
+.page-header p{color:var(--muted);font-size:0.82rem;}
+
+/* ── INLINE CAT SWITCHER ── */
+.cat-switcher{display:flex;gap:0.3rem;margin-bottom:1.25rem;}
+.cs-btn{
+  background:none;border:1px solid var(--border);color:var(--muted);
+  font-family:'Inter',sans-serif;font-size:0.75rem;font-weight:500;
+  padding:5px 14px;border-radius:6px;cursor:pointer;transition:all 0.12s;
+}
+.cs-btn:hover{border-color:var(--border2);color:var(--text);}
+.cs-btn.active{background:var(--bluelight);border-color:var(--blue);color:var(--blue);}
+
+/* ── TABS ── */
+.tabs{display:flex;flex-wrap:wrap;gap:0.35rem;margin-bottom:1.75rem;}
+.tab{
+  background:var(--bg2);border:1px solid var(--border);color:var(--muted);
+  font-family:'Inter',sans-serif;font-size:0.73rem;font-weight:500;
+  padding:4px 12px;border-radius:20px;cursor:pointer;transition:all 0.12s;
+}
 .tab:hover{border-color:var(--border2);color:var(--text);}
-.tab.active{background:var(--surface);border-color:var(--gold);color:var(--gold);}
+.tab.active{background:var(--bluelight);border-color:var(--blue);color:var(--blue);}
 
-/* CARDS */
-.card{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:1.5rem;margin-bottom:1rem;}
+/* ── CARD ── */
+.card{background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:1.4rem;margin-bottom:1rem;}
 
-/* BUTTONS */
-.btn{display:inline-flex;align-items:center;gap:6px;font-family:'Karla',sans-serif;font-size:0.85rem;font-weight:500;padding:8px 18px;border-radius:6px;cursor:pointer;transition:all 0.15s;border:1px solid transparent;}
-.btn-gold{background:var(--gold);color:var(--bg);border-color:var(--gold);}
-.btn-gold:hover{background:var(--gold2);}
+/* ── BUTTONS ── */
+.btn{display:inline-flex;align-items:center;gap:5px;font-family:'Inter',sans-serif;font-size:0.8rem;font-weight:500;padding:7px 16px;border-radius:7px;cursor:pointer;transition:all 0.13s;border:1px solid transparent;}
+.btn-primary{background:var(--blue);color:#fff;border-color:var(--blue);}
+.btn-primary:hover{background:var(--blue2);}
 .btn-ghost{background:none;border-color:var(--border2);color:var(--text);}
-.btn-ghost:hover{background:var(--surface);}
-.btn-sm{padding:5px 12px;font-size:0.78rem;}
-.btn-correct{background:rgba(90,154,106,0.15);border-color:var(--green);color:var(--green);}
-.btn-correct:hover{background:rgba(90,154,106,0.25);}
-.btn-wrong{background:rgba(200,80,80,0.15);border-color:var(--red);color:var(--red);}
-.btn-wrong:hover{background:rgba(200,80,80,0.25);}
+.btn-ghost:hover{background:var(--bg3);}
+.btn-sm{padding:5px 11px;font-size:0.74rem;}
+.btn-correct{background:rgba(42,138,80,0.1);border-color:var(--green);color:var(--green);}
+.btn-correct:hover{background:rgba(42,138,80,0.18);}
+.btn-wrong{background:rgba(208,64,64,0.08);border-color:var(--red);color:var(--red);}
+.btn-wrong:hover{background:rgba(208,64,64,0.15);}
 
-/* BADGE */
-.badge{font-size:0.72rem;font-weight:500;padding:3px 9px;border-radius:20px;background:var(--surface);color:var(--muted);border:1px solid var(--border);}
-.badge-gold{background:rgba(201,168,76,0.12);color:var(--gold);border-color:rgba(201,168,76,0.3);}
+/* ── BADGE ── */
+.badge{font-size:0.67rem;font-weight:500;padding:2px 8px;border-radius:20px;background:var(--bg3);color:var(--muted);border:1px solid var(--border);}
+.badge-blue{background:var(--bluelight);color:var(--blue);border-color:rgba(46,125,209,0.22);}
 
-/* HOME */
-.cat-section{margin-bottom:3rem;}
-.cat-section h2{font-family:'Cormorant Garamond',serif;font-size:1.5rem;font-weight:600;color:var(--cream);margin-bottom:0.25rem;}
-.cat-section .cat-desc{color:var(--muted);font-size:0.85rem;margin-bottom:1.25rem;}
-.text-grid{display:grid;grid-template-columns:1fr 1fr;gap:0.85rem;}
-.text-card{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:1.25rem 1.5rem;cursor:pointer;transition:all 0.2s;position:relative;overflow:hidden;}
-.text-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:var(--gold);opacity:0;transition:opacity 0.2s;}
-.text-card:hover{border-color:var(--border2);transform:translateY(-2px);}
-.text-card:hover::before{opacity:1;}
-.text-card h3{font-family:'Cormorant Garamond',serif;font-size:1.15rem;font-weight:600;color:var(--cream);margin-bottom:0.15rem;}
-.text-card .tc-sub{color:var(--muted);font-size:0.8rem;margin-bottom:0.75rem;}
-.text-card .tc-snippet{font-family:'Cormorant Garamond',serif;font-style:italic;font-size:0.85rem;color:var(--faint);line-height:1.5;border-left:2px solid var(--faint);padding-left:0.75rem;}
-.text-card .tc-count{margin-top:0.75rem;font-size:0.72rem;color:var(--muted);}
-.mode-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:0.75rem;margin-bottom:2.5rem;}
-.mode-card{background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:1rem;cursor:pointer;transition:all 0.15s;text-align:center;}
-.mode-card:hover{border-color:var(--gold);background:var(--bg2);}
-.mode-card .mi{font-size:1.3rem;margin-bottom:0.3rem;display:block;}
-.mode-card .mn{font-size:0.8rem;font-weight:500;color:var(--text);}
+/* ── PROGRESS ── */
+.prog-track{height:2px;background:var(--surface);border-radius:2px;margin-bottom:1.25rem;}
+.prog-fill{height:100%;background:var(--blue);border-radius:2px;transition:width 0.3s;}
+.counter{text-align:center;font-size:0.75rem;color:var(--muted);margin-bottom:0.85rem;}
 
-/* FLASHCARD */
-.fc-shell{perspective:1200px;max-width:620px;margin:0 auto 1.5rem;}
-.fc-inner{position:relative;width:100%;min-height:240px;transform-style:preserve-3d;transition:transform 0.5s cubic-bezier(.4,0,.2,1);cursor:pointer;}
+/* ── FLASHCARD ── */
+.fc-shell{perspective:1200px;max-width:600px;margin:0 auto 1.25rem;}
+.fc-inner{position:relative;width:100%;min-height:230px;transform-style:preserve-3d;transition:transform 0.48s cubic-bezier(.4,0,.2,1);cursor:pointer;}
 .fc-inner.flipped{transform:rotateY(180deg);}
-.fc-face{position:absolute;width:100%;min-height:240px;backface-visibility:hidden;-webkit-backface-visibility:hidden;border-radius:12px;padding:2rem;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;}
-.fc-front{background:var(--bg2);border:1px solid var(--border);}
-.fc-back{background:var(--bg3);border:1px solid var(--gold);transform:rotateY(180deg);}
-.fc-phrase{font-family:'Cormorant Garamond',serif;font-style:italic;font-size:1.5rem;color:var(--cream);letter-spacing:0.02em;margin-bottom:0.75rem;}
-.fc-context{font-family:'Cormorant Garamond',serif;font-style:italic;font-size:0.88rem;color:var(--faint);margin-bottom:1rem;line-height:1.6;}
-.fc-hint{font-size:0.75rem;color:var(--faint);margin-top:auto;}
+.fc-face{position:absolute;width:100%;min-height:230px;backface-visibility:hidden;-webkit-backface-visibility:hidden;border-radius:14px;padding:1.75rem;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;}
+.fc-front{background:var(--bg2);border:1px solid var(--border);box-shadow:0 2px 12px rgba(46,125,209,0.07);}
+.fc-back{background:var(--bluelight);border:1px solid rgba(46,125,209,0.25);transform:rotateY(180deg);}
+.fc-phrase{font-family:'DM Serif Display',serif;font-style:italic;font-size:1.45rem;color:var(--text);margin-bottom:0.6rem;}
+.fc-context{font-family:'DM Serif Display',serif;font-style:italic;font-size:0.82rem;color:var(--faint);margin-bottom:0.85rem;line-height:1.55;}
+.fc-hint{font-size:0.68rem;color:var(--faint);margin-top:auto;}
 .fc-back-content{text-align:left;width:100%;}
-.fc-back-phrase{font-family:'Cormorant Garamond',serif;font-style:italic;font-size:1.1rem;color:var(--gold);margin-bottom:0.75rem;text-align:center;}
-.fc-label{font-size:0.7rem;text-transform:uppercase;letter-spacing:0.1em;color:var(--muted);margin-bottom:0.3rem;}
-.fc-value{font-size:0.88rem;color:var(--text);line-height:1.65;margin-bottom:0.5rem;}
-.fc-actions{display:flex;gap:0.75rem;justify-content:center;flex-wrap:wrap;}
-.counter{text-align:center;font-size:0.8rem;color:var(--muted);margin-bottom:1rem;}
-.prog-track{height:3px;background:var(--surface);border-radius:2px;margin-bottom:1.5rem;}
-.prog-fill{height:100%;background:var(--gold);border-radius:2px;transition:width 0.3s;}
+.fc-back-phrase{font-family:'DM Serif Display',serif;font-style:italic;font-size:1rem;color:var(--blue);margin-bottom:0.6rem;text-align:center;}
+.fc-label{font-size:0.64rem;text-transform:uppercase;letter-spacing:0.09em;color:var(--muted);margin-bottom:0.25rem;}
+.fc-value{font-size:0.82rem;color:var(--text);line-height:1.65;margin-bottom:0.4rem;}
+.fc-actions{display:flex;gap:0.6rem;justify-content:center;flex-wrap:wrap;}
+.ctx-title{font-family:'DM Serif Display',serif;font-size:1.2rem;font-weight:400;color:var(--text);margin-bottom:0.35rem;}
+.ctx-prompt{font-size:0.68rem;color:var(--muted);margin-bottom:0.6rem;text-transform:uppercase;letter-spacing:0.07em;}
+.ctx-q{font-size:0.9rem;color:var(--text);line-height:1.6;}
 
-/* CONTEXT CARD FRONT */
-.ctx-title{font-family:'Cormorant Garamond',serif;font-size:1.35rem;font-weight:600;color:var(--cream);margin-bottom:0.4rem;}
-.ctx-prompt{font-size:0.75rem;color:var(--muted);margin-bottom:0.75rem;text-transform:uppercase;letter-spacing:0.06em;}
-.ctx-q{font-size:1rem;color:var(--text);line-height:1.6;}
-
-/* FILL IN BLANK */
-.fib-phrase{font-family:'Cormorant Garamond',serif;font-style:italic;font-size:1.3rem;color:var(--cream);line-height:2;text-align:center;margin:1.25rem 0;}
-.blank{display:inline-block;border:none;border-bottom:2px solid var(--gold);background:transparent;color:var(--gold2);font-family:'Cormorant Garamond',serif;font-style:italic;font-size:inherit;text-align:center;padding:0 4px 2px;min-width:60px;}
-.blank:focus{outline:none;border-bottom-color:var(--cream);}
+/* ── FILL IN BLANK ── */
+.fib-phrase{font-family:'DM Serif Display',serif;font-style:italic;font-size:1.25rem;color:var(--text);line-height:2;text-align:center;margin:1rem 0;}
+.blank{display:inline-block;border:none;border-bottom:2px solid var(--blue);background:transparent;color:var(--blue);font-family:'DM Serif Display',serif;font-style:italic;font-size:inherit;text-align:center;padding:0 3px 1px;min-width:55px;}
+.blank:focus{outline:none;border-bottom-color:var(--blue2);}
 .blank.correct{border-color:var(--green);color:var(--green);}
 .blank.revealed{border-color:var(--red);color:var(--red);}
-.result-banner{text-align:center;padding:0.75rem;border-radius:8px;font-size:0.88rem;font-weight:500;display:none;margin-top:0.5rem;}
-.result-banner.ok{display:block;background:rgba(90,154,106,0.15);color:var(--green);border:1px solid rgba(90,154,106,0.3);}
-.result-banner.no{display:block;background:rgba(200,80,80,0.12);color:var(--red);border:1px solid rgba(200,80,80,0.3);}
-.analysis-reveal{margin-top:1.5rem;padding-top:1.25rem;border-top:1px solid var(--border);display:none;animation:fadeIn 0.4s ease;}
+.result-banner{text-align:center;padding:0.6rem;border-radius:7px;font-size:0.82rem;font-weight:500;display:none;margin-top:0.4rem;}
+.result-banner.ok{display:block;background:rgba(42,138,80,0.08);color:var(--green);border:1px solid rgba(42,138,80,0.22);}
+.result-banner.no{display:block;background:rgba(208,64,64,0.07);color:var(--red);border:1px solid rgba(208,64,64,0.18);}
+.analysis-reveal{margin-top:1.25rem;padding-top:1rem;border-top:1px solid var(--border);display:none;animation:fadeIn 0.35s ease;}
 .analysis-reveal.visible{display:block;}
-@keyframes fadeIn{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:translateY(0);}}
-.al{font-size:0.7rem;text-transform:uppercase;letter-spacing:0.1em;color:var(--gold);margin-bottom:0.5rem;}
-.analysis-reveal p{font-size:0.9rem;line-height:1.75;color:var(--text);}
+@keyframes fadeIn{from{opacity:0;transform:translateY(6px);}to{opacity:1;transform:translateY(0);}}
+.al{font-size:0.64rem;text-transform:uppercase;letter-spacing:0.09em;color:var(--blue);margin-bottom:0.4rem;}
+.analysis-reveal p{font-size:0.85rem;line-height:1.75;color:var(--text);}
 
-/* NOTES */
-.notes-list .note{background:var(--bg2);border:1px solid var(--border);border-left:3px solid var(--gold);border-radius:0 8px 8px 0;padding:1.25rem 1.5rem;margin-bottom:0.75rem;}
-.note .n-phrase{font-family:'Cormorant Garamond',serif;font-style:italic;font-size:1.2rem;color:var(--cream);margin-bottom:0.2rem;}
-.note .n-src{font-family:'Cormorant Garamond',serif;font-style:italic;font-size:0.85rem;color:var(--faint);margin-bottom:0.55rem;}
-.note .n-analysis{font-size:0.875rem;color:var(--muted);line-height:1.7;}
-.ctx-box{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:1.5rem;margin-bottom:1rem;}
-.ctx-box h3{font-family:'Cormorant Garamond',serif;font-size:1.2rem;color:var(--cream);margin-bottom:0.75rem;}
-.ctx-box p{font-size:0.9rem;color:var(--muted);line-height:1.75;}
-.ctx-box p+p{margin-top:0.75rem;}
-.section-label{font-family:'Cormorant Garamond',serif;font-size:1.1rem;font-weight:400;color:var(--muted);margin:1.5rem 0 1rem;letter-spacing:0.04em;}
+/* ── NOTES ── */
+.notes-list .note{background:var(--bg2);border:1px solid var(--border);border-left:2px solid var(--blue);border-radius:0 10px 10px 0;padding:1.1rem 1.35rem;margin-bottom:0.6rem;}
+.note .n-phrase{font-family:'DM Serif Display',serif;font-style:italic;font-size:1.1rem;color:var(--text);margin-bottom:0.15rem;}
+.note .n-src{font-family:'DM Serif Display',serif;font-style:italic;font-size:0.78rem;color:var(--faint);margin-bottom:0.45rem;}
+.note .n-analysis{font-size:0.82rem;color:var(--muted);line-height:1.7;}
+.ctx-box{background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:1.35rem;margin-bottom:0.85rem;}
+.ctx-box h3{font-family:'DM Serif Display',serif;font-size:1.1rem;font-weight:400;color:var(--text);margin-bottom:0.65rem;}
+.ctx-box p{font-size:0.85rem;color:var(--muted);line-height:1.75;}
+.ctx-box p+p{margin-top:0.65rem;}
+.section-label{font-family:'DM Serif Display',serif;font-size:1rem;font-weight:400;color:var(--muted);margin:1.25rem 0 0.75rem;}
 
-/* AIC specific — character role badge */
-.role-tag{font-size:0.72rem;color:var(--muted);font-style:italic;margin-bottom:0.75rem;}
-
-@media(max-width:600px){
-  .text-grid{grid-template-columns:1fr;}
-  .mode-grid{grid-template-columns:1fr 1fr;}
-  nav .nav-top{padding:0 0.75rem;}
-  .nav-btn{font-size:0.72rem;padding:5px 8px;}
+@media(max-width:560px){
+  .home-cards{grid-template-columns:1fr 1fr;}
+  .home-logo{font-size:3rem;}
   .view{padding:1.5rem 1rem;}
-  .cat-bar{padding:0 0.75rem;}
 }
 </style>
 </head>
 <body>
 
-<nav>
-  <div class="nav-top">
-    <div class="nav-logo">Lit<em>Rev</em></div>
-    <button class="nav-btn active" onclick="showView('home')">Home</button>
-    <button class="nav-btn" onclick="showView('flashcards')">Flashcards</button>
-    <button class="nav-btn" onclick="showView('context')">Context</button>
-    <button class="nav-btn" onclick="showView('fill')">Fill-in</button>
-    <button class="nav-btn" onclick="showView('notes')">Notes</button>
-  </div>
-  <div class="cat-bar" id="cat-bar" style="display:none">
-    <button class="cat-btn active" onclick="setCat('poems')">Poems</button>
-    <button class="cat-btn" onclick="setCat('aic')">An Inspector Calls</button>
-  </div>
-</nav>
+<!-- TOPBAR -->
+<div id="topbar">
+  <button class="icon-btn hamburger" onclick="toggleSidebar()" aria-label="Menu">
+    <span></span><span></span><span></span>
+  </button>
+  <div class="topbar-logo" onclick="showView('home')">Lit<em>Rev</em></div>
+  <div class="topbar-spacer"></div>
+  <button class="icon-btn" id="dark-toggle" onclick="toggleDark()" title="Toggle dark mode">☀️</button>
+</div>
 
-<!-- HOME -->
-<div id="view-home" class="view active">
-  <div class="page-header">
-    <h1>Revision</h1>
-    <p>Select a text to begin, or choose a mode to revise all texts in a category.</p>
+<!-- SIDEBAR OVERLAY -->
+<div id="sidebar-overlay" onclick="closeSidebar()"></div>
+
+<!-- SIDEBAR -->
+<div id="sidebar">
+  <div class="sb-section">
+    <span class="sb-label">Navigate</span>
+    <button class="sb-item active" id="sb-home" onclick="navTo('home')">
+      <span class="sb-icon">⌂</span> Home
+    </button>
   </div>
 
-  <div class="cat-section">
-    <h2>Poems</h2>
-    <p class="cat-desc">Four war and conflict poems — key phrases, analysis, context.</p>
-    <div class="mode-grid">
-      <div class="mode-card" onclick="goMode('flashcards','poems')"><span class="mi">🃏</span><div class="mn">Flashcards</div></div>
-      <div class="mode-card" onclick="goMode('context','poems')"><span class="mi">📖</span><div class="mn">Context</div></div>
-      <div class="mode-card" onclick="goMode('fill','poems')"><span class="mi">✍️</span><div class="mn">Fill-in</div></div>
+  <div class="sb-divider"></div>
+
+  <div class="sb-section">
+    <button class="sb-cat-toggle" id="toggle-poems" onclick="toggleCat('poems')">
+      <span>Poems</span><span class="arrow">▾</span>
+    </button>
+    <div class="sb-cat-body" id="cat-poems">
+      <button class="sb-item" onclick="navMode('flashcards','poems')"><span class="sb-icon">🃏</span> Flashcards</button>
+      <button class="sb-item" onclick="navMode('context','poems')"><span class="sb-icon">📖</span> Context Cards</button>
+      <button class="sb-item" onclick="navMode('fill','poems')"><span class="sb-icon">✍️</span> Fill-in-Blank</button>
+      <button class="sb-item" onclick="navMode('notes','poems')"><span class="sb-icon">📋</span> Notes</button>
     </div>
-    <div class="text-grid" id="home-poems"></div>
   </div>
 
-  <div class="cat-section" style="margin-top:2rem">
-    <h2>An Inspector Calls</h2>
-    <p class="cat-desc">Seven characters — key quotes, analysis, context and literary terms.</p>
-    <div class="mode-grid">
-      <div class="mode-card" onclick="goMode('flashcards','aic')"><span class="mi">🃏</span><div class="mn">Flashcards</div></div>
-      <div class="mode-card" onclick="goMode('context','aic')"><span class="mi">📖</span><div class="mn">Context</div></div>
-      <div class="mode-card" onclick="goMode('fill','aic')"><span class="mi">✍️</span><div class="mn">Fill-in</div></div>
+  <div class="sb-divider"></div>
+
+  <div class="sb-section">
+    <button class="sb-cat-toggle" id="toggle-aic" onclick="toggleCat('aic')">
+      <span>An Inspector Calls</span><span class="arrow">▾</span>
+    </button>
+    <div class="sb-cat-body" id="cat-aic">
+      <button class="sb-item" onclick="navMode('flashcards','aic')"><span class="sb-icon">🃏</span> Flashcards</button>
+      <button class="sb-item" onclick="navMode('context','aic')"><span class="sb-icon">📖</span> Context Cards</button>
+      <button class="sb-item" onclick="navMode('fill','aic')"><span class="sb-icon">✍️</span> Fill-in-Blank</button>
+      <button class="sb-item" onclick="navMode('notes','aic')"><span class="sb-icon">📋</span> Notes</button>
     </div>
-    <div class="text-grid" id="home-aic"></div>
   </div>
 </div>
 
-<!-- FLASHCARDS -->
-<div id="view-flashcards" class="view">
-  <div class="page-header"><h1>Flashcards</h1><p>Tap to reveal the analysis of each key phrase.</p></div>
-  <div class="cat-bar" style="position:static;border:none;padding:0;margin-bottom:1rem;">
-    <button class="cat-btn active" id="fc-cat-poems" onclick="fcSetCat('poems')">Poems</button>
-    <button class="cat-btn" id="fc-cat-aic" onclick="fcSetCat('aic')">An Inspector Calls</button>
-  </div>
-  <div class="tabs" id="fc-tabs"></div>
-  <div id="fc-content"></div>
-</div>
+<!-- MAIN -->
+<div id="main">
 
-<!-- CONTEXT -->
-<div id="view-context" class="view">
-  <div class="page-header"><h1>Context Cards</h1><p>Test your knowledge of background, themes, form, and key terms.</p></div>
-  <div class="cat-bar" style="position:static;border:none;padding:0;margin-bottom:1rem;">
-    <button class="cat-btn active" id="ctx-cat-poems" onclick="ctxSetCat('poems')">Poems</button>
-    <button class="cat-btn" id="ctx-cat-aic" onclick="ctxSetCat('aic')">An Inspector Calls</button>
+  <!-- HOME -->
+  <div id="view-home" class="view active">
+    <div class="home-hero">
+      <div class="home-logo">Lit<em>Rev</em></div>
+      <p class="home-tagline">A focused revision platform for GCSE English Literature — quotes, analysis, context, and interactive study tools.</p>
+      <div class="home-cards">
+        <div class="home-card" onclick="navMode('flashcards','poems')">
+          <span class="home-card-icon">🃏</span>
+          <div class="home-card-title">Flashcards</div>
+          <div class="home-card-sub">Key phrases &amp; analysis</div>
+        </div>
+        <div class="home-card" onclick="navMode('context','poems')">
+          <span class="home-card-icon">📖</span>
+          <div class="home-card-title">Context Cards</div>
+          <div class="home-card-sub">Background &amp; themes</div>
+        </div>
+        <div class="home-card" onclick="navMode('fill','poems')">
+          <span class="home-card-icon">✍️</span>
+          <div class="home-card-title">Fill-in-Blank</div>
+          <div class="home-card-sub">Test your recall</div>
+        </div>
+        <div class="home-card" onclick="navMode('notes','poems')">
+          <span class="home-card-icon">📋</span>
+          <div class="home-card-title">Notes</div>
+          <div class="home-card-sub">Browse everything</div>
+        </div>
+      </div>
+      <button class="home-start-btn" onclick="toggleSidebar()">Open revision menu →</button>
+      <div class="home-footer">Poems · An Inspector Calls · GCSE English Literature</div>
+    </div>
   </div>
-  <div class="tabs" id="ctx-tabs"></div>
-  <div id="ctx-content"></div>
-</div>
 
-<!-- FILL IN BLANK -->
-<div id="view-fill" class="view">
-  <div class="page-header"><h1>Fill in the Blank</h1><p>Complete the key phrase. Reveal to see the full quote and analysis.</p></div>
-  <div class="cat-bar" style="position:static;border:none;padding:0;margin-bottom:1rem;">
-    <button class="cat-btn active" id="fib-cat-poems" onclick="fibSetCat('poems')">Poems</button>
-    <button class="cat-btn" id="fib-cat-aic" onclick="fibSetCat('aic')">An Inspector Calls</button>
+  <!-- FLASHCARDS -->
+  <div id="view-flashcards" class="view">
+    <div class="page-header"><h1>Flashcards</h1><p>Tap a card to reveal its analysis.</p></div>
+    <div class="cat-switcher">
+      <button class="cs-btn active" id="fc-cat-poems" onclick="fcSetCat('poems')">Poems</button>
+      <button class="cs-btn" id="fc-cat-aic" onclick="fcSetCat('aic')">An Inspector Calls</button>
+    </div>
+    <div class="tabs" id="fc-tabs"></div>
+    <div id="fc-content"></div>
   </div>
-  <div class="tabs" id="fib-tabs"></div>
-  <div id="fib-content"></div>
-</div>
 
-<!-- NOTES -->
-<div id="view-notes" class="view">
-  <div class="page-header"><h1>Notes</h1><p>Browse all key phrases, analysis, and context.</p></div>
-  <div class="cat-bar" style="position:static;border:none;padding:0;margin-bottom:1rem;">
-    <button class="cat-btn active" id="notes-cat-poems" onclick="notesSetCat('poems')">Poems</button>
-    <button class="cat-btn" id="notes-cat-aic" onclick="notesSetCat('aic')">An Inspector Calls</button>
+  <!-- CONTEXT -->
+  <div id="view-context" class="view">
+    <div class="page-header"><h1>Context Cards</h1><p>Test your knowledge of background, themes, and key terms.</p></div>
+    <div class="cat-switcher">
+      <button class="cs-btn active" id="ctx-cat-poems" onclick="ctxSetCat('poems')">Poems</button>
+      <button class="cs-btn" id="ctx-cat-aic" onclick="ctxSetCat('aic')">An Inspector Calls</button>
+    </div>
+    <div class="tabs" id="ctx-tabs"></div>
+    <div id="ctx-content"></div>
   </div>
-  <div class="tabs" id="notes-tabs"></div>
-  <div id="notes-content"></div>
-</div>
+
+  <!-- FILL IN BLANK -->
+  <div id="view-fill" class="view">
+    <div class="page-header"><h1>Fill in the Blank</h1><p>Complete the key phrase — reveal to see full analysis.</p></div>
+    <div class="cat-switcher">
+      <button class="cs-btn active" id="fib-cat-poems" onclick="fibSetCat('poems')">Poems</button>
+      <button class="cs-btn" id="fib-cat-aic" onclick="fibSetCat('aic')">An Inspector Calls</button>
+    </div>
+    <div class="tabs" id="fib-tabs"></div>
+    <div id="fib-content"></div>
+  </div>
+
+  <!-- NOTES -->
+  <div id="view-notes" class="view">
+    <div class="page-header"><h1>Notes</h1><p>Browse all key phrases, analysis, and context.</p></div>
+    <div class="cat-switcher">
+      <button class="cs-btn active" id="notes-cat-poems" onclick="notesSetCat('poems')">Poems</button>
+      <button class="cs-btn" id="notes-cat-aic" onclick="notesSetCat('aic')">An Inspector Calls</button>
+    </div>
+    <div class="tabs" id="notes-tabs"></div>
+    <div id="notes-content"></div>
+  </div>
+
+</div><!-- /main -->
 
 <script>
 // ═══════════════════════════════════════════════════════
@@ -251,19 +389,19 @@ const POEMS = [
     contextQuestions:[
       {q:'When and why was this poem written?',a:'December 1899 during the Second Boer War (1899–1902). Hardy was a fierce critic of the war and used a domestic lens to make its tragedy personal rather than political.'},
       {q:'What is the two-part structure of the poem?',a:'Part I ("The Tragedy"): the wife receives a telegram saying her husband is killed. Part II ("The Irony"): a letter arrives from the husband himself, written before his death, full of plans for their future.'},
-      {q:'What is the central irony of the poem?',a:'The husband\'s letter speaks of life and hope at the exact moment the wife already knows he is dead.'},
+      {q:'What is the central irony of the poem?',a:"The husband's letter speaks of life and hope at the exact moment the wife already knows he is dead."},
       {q:'What does the London fog symbolise throughout the poem?',a:'Grief, confusion, and the bleakness of war — both literal London smog and a sustained symbol of the darkness about to engulf the wife.'},
       {q:'How does the fog change between Part I and Part II, and why is this significant?',a:'In Part II the fog "hangs thicker" — grief does not lift overnight. The comparative mirrors the wife\'s worsening emotional state.'},
-      {q:'How does Hardy\'s approach to war differ from a typical war poem?',a:'He uses an intimate domestic lens — the wife left behind rather than the battlefield — making the tragedy personal and human rather than heroic or political.'},
+      {q:"How does Hardy's approach to war differ from a typical war poem?",a:'He uses an intimate domestic lens — the wife left behind rather than the battlefield — making the tragedy personal and human rather than heroic or political.'},
     ],
     quotes:[
-      {phrase:'tawny vapour',fullQuote:'She sits in the tawny vapour / That the Thames-side lanes have uprolled',location:'Part I, opening',blank:'tawny',analysis:`'Tawny vapour' is the London fog — thick and yellow-brown. 'Tawny' immediately creates an atmosphere of suffocation and gloom. The fog is both literal and symbolic of the confusion and darkness of grief about to engulf the wife. She 'sits', not acts — passive before the approaching news.`},
-      {phrase:'waning taper',fullQuote:'Like a waning taper / The street-lamp glimmers cold',location:'Part I',blank:'waning',analysis:`The simile comparing the street-lamp to a 'waning taper' — a dying candle — reinforces the mood of fading light and diminishing hope. Light, usually a symbol of hope or life, is reduced to something guttering and cheerless.`},
-      {phrase:'glimmers cold',fullQuote:'Like a waning taper / The street-lamp glimmers cold',location:'Part I',blank:'cold',analysis:`'Cold' strips the light of any warmth or comfort. It anticipates the cold shock of the telegram to come. The combination of faint light and coldness creates a mood of desolation before any tragedy is announced.`},
-      {phrase:'He — he has fallen —',fullQuote:'He — he has fallen — in the far South Land...',location:'Part I',blank:'fallen',analysis:`The dashes mime the wife's inability to process what she is reading — the mind stuttering before an unbearable truth. The repetition of 'he' captures the precise moment of psychological shock. 'Fallen' is a euphemism for killed, softening yet still delivering the devastating news.`},
-      {phrase:'fog hangs thicker',fullQuote:'Tis the morrow; the fog hangs thicker',location:'Part II, opening',blank:'thicker',analysis:`The new day brings no clarity — the fog has intensified. 'Thicker' is deeply symbolic: grief does not lift overnight. The comparative adjective mirrors the wife's worsening emotional state as she must face the reality of yesterday's news.`},
-      {phrase:'whom the worm now knows',fullQuote:'His hand, whom the worm now knows',location:'Part II',blank:'worm',analysis:`One of the most chilling phrases in the poem. The letter is in the husband's own handwriting — 'his hand' — but Hardy undercuts it: 'whom the worm now knows' means he is already buried, already decomposing. The juxtaposition of intimate handwriting with brutal decay is deeply unsettling.`},
-      {phrase:'Fresh — firm — penned in highest feather',fullQuote:'Fresh — firm — penned in highest feather — / Page-full of his hoped return',location:'Part II',blank:'Fresh',analysis:`The dashes here convey energy and vitality — the opposite of the earlier dashes of shock. 'Fresh', 'firm', and 'highest feather' (in the best of spirits) brim with optimism. This makes the irony devastating: the letter radiates life at the exact moment the wife knows there is no future.`},
+      {phrase:'tawny vapour',fullQuote:'She sits in the tawny vapour / That the Thames-side lanes have uprolled',location:'Part I, opening',blank:'tawny',analysis:"'Tawny vapour' is the London fog — thick and yellow-brown. 'Tawny' immediately creates an atmosphere of suffocation and gloom. The fog is both literal and symbolic of the confusion and darkness of grief about to engulf the wife. She 'sits', not acts — passive before the approaching news."},
+      {phrase:'waning taper',fullQuote:'Like a waning taper / The street-lamp glimmers cold',location:'Part I',blank:'waning',analysis:"The simile comparing the street-lamp to a 'waning taper' — a dying candle — reinforces the mood of fading light and diminishing hope. Light, usually a symbol of hope or life, is reduced to something guttering and cheerless."},
+      {phrase:'glimmers cold',fullQuote:'Like a waning taper / The street-lamp glimmers cold',location:'Part I',blank:'cold',analysis:"'Cold' strips the light of any warmth or comfort. It anticipates the cold shock of the telegram to come. The combination of faint light and coldness creates a mood of desolation before any tragedy is announced."},
+      {phrase:'He — he has fallen —',fullQuote:'He — he has fallen — in the far South Land...',location:'Part I',blank:'fallen',analysis:"The dashes mime the wife's inability to process what she is reading — the mind stuttering before an unbearable truth. The repetition of 'he' captures the precise moment of psychological shock. 'Fallen' is a euphemism for killed, softening yet still delivering the devastating news."},
+      {phrase:'fog hangs thicker',fullQuote:'Tis the morrow; the fog hangs thicker',location:'Part II, opening',blank:'thicker',analysis:"The new day brings no clarity — the fog has intensified. 'Thicker' is deeply symbolic: grief does not lift overnight. The comparative adjective mirrors the wife's worsening emotional state as she must face the reality of yesterday's news."},
+      {phrase:'whom the worm now knows',fullQuote:'His hand, whom the worm now knows',location:'Part II',blank:'worm',analysis:"One of the most chilling phrases in the poem. The letter is in the husband's own handwriting — 'his hand' — but Hardy undercuts it: 'whom the worm now knows' means he is already buried, already decomposing. The juxtaposition of intimate handwriting with brutal decay is deeply unsettling."},
+      {phrase:'Fresh — firm — penned in highest feather',fullQuote:"Fresh — firm — penned in highest feather — / Page-full of his hoped return",location:'Part II',blank:'Fresh',analysis:"The dashes here convey energy and vitality — the opposite of the earlier dashes of shock. 'Fresh', 'firm', and 'highest feather' (in the best of spirits) brim with optimism. This makes the irony devastating: the letter radiates life at the exact moment the wife knows there is no future."},
     ]
   },
   {
@@ -272,22 +410,22 @@ const POEMS = [
     context:`Ozymandias was written by Percy Bysshe Shelley in 1817, published 1818, as part of a friendly competition with Horace Smith — both wrote sonnets about a broken statue of Ramesses II (Ozymandias). The poem was written during intense political debate about tyranny and empire in Britain. Shelley was a radical who despised monarchy and authoritarian power.\n\nThe sonnet uses a layered narrative structure — the speaker reports what a traveller told him, who in turn quotes the inscription on the statue — creating deliberate distance and irony. The central theme is the futility of human power and pride: no matter how mighty a ruler, time and nature will reduce their legacy to ruin.`,
     contextQuestions:[
       {q:'When was Ozymandias written, and what was the occasion?',a:'Written 1817, published 1818, as part of a friendly competition with Horace Smith — both wrote sonnets about a broken statue of Ramesses II.'},
-      {q:'What was Shelley\'s political view and how does it shape the poem?',a:'Shelley was a radical who despised monarchy and authoritarian power. The poem attacks tyrannical rulers by showing their inevitable fall.'},
+      {q:"What was Shelley's political view and how does it shape the poem?",a:'Shelley was a radical who despised monarchy and authoritarian power. The poem attacks tyrannical rulers by showing their inevitable fall.'},
       {q:'What is the layered narrative structure of the poem?',a:'The speaker reports what a traveller told him, who in turn quotes the inscription — creating deliberate distance and layers of irony.'},
       {q:'What is the central theme?',a:'The futility of human power and pride: no matter how mighty a ruler, time and nature will reduce their legacy to ruin.'},
-      {q:'What is the significance of the sculptor in the poem?',a:'The sculptor — an artist — has outlasted the tyrant. By capturing Ozymandias\'s character truthfully, art survives where political power does not.'},
-      {q:'Why is the desert such a powerful final image?',a:'It stretches boundlessly and indifferently, having absorbed and erased Ozymandias\'s legacy entirely. Nature, not the tyrant, has the last word.'},
+      {q:'What is the significance of the sculptor in the poem?',a:"The sculptor — an artist — has outlasted the tyrant. By capturing Ozymandias's character truthfully, art survives where political power does not."},
+      {q:'Why is the desert such a powerful final image?',a:"It stretches boundlessly and indifferently, having absorbed and erased Ozymandias's legacy entirely. Nature, not the tyrant, has the last word."},
     ],
     quotes:[
-      {phrase:'vast and trunkless legs',fullQuote:'Two vast and trunkless legs of stone / Stand in the desert',location:'Lines 1–2',blank:'trunkless',analysis:`'Vast' hints at Ozymandias's former ambition, but 'trunkless' immediately undercuts it — what remains is incomplete and purposeless. The legs without a body are absurd and deflating. The greater the claim to power, the more pathetic the ruin.`},
-      {phrase:'sneer of cold command',fullQuote:'Half sunk a shattered visage lies, whose frown, / And wrinkled lip, and sneer of cold command',location:'Lines 3–4',blank:'cold',analysis:`'Sneer of cold command' suggests a ruler so accustomed to obedience that cruelty became his natural expression. Yet this imperious face now lies half-buried in sand, unable to command anything. The arrogance is preserved in stone even as the power it represents has dissolved.`},
-      {phrase:'sculptor well those passions read',fullQuote:'Tell that its sculptor well those passions read / Which yet survive',location:'Lines 6–7',blank:'sculptor',analysis:`The sculptor — an artist — has outlasted the tyrant. 'Well those passions read' means the sculptor understood and captured Ozymandias's character truthfully. This is Shelley asserting the power of art over political power: the artist's work endures where the king's empire does not.`},
-      {phrase:'which yet survive',fullQuote:'Which yet survive, stamped on these lifeless things',location:'Line 7',blank:'survive',analysis:`'Survive' is quietly triumphant. The passions, arrogance, and cruelty of Ozymandias survive — but only in art. The irony is that what outlasts him is not his power but the record of his vanity, preserved by the sculptor he likely considered beneath him.`},
-      {phrase:'King of Kings',fullQuote:'My name is Ozymandias, King of Kings',location:'Line 10',blank:'King',analysis:`The grandiose superlative 'King of Kings' amplifies the fall. The higher the claim, the greater the irony of the surrounding ruin. The biblical echo (used of Christ) hints at blasphemous overreach — Ozymandias compared himself to a god, and the desert is his answer.`},
-      {phrase:'Look on my Works, ye Mighty, and despair!',fullQuote:'Look on my Works, ye Mighty, and despair!',location:'Line 11',blank:'despair',analysis:`The inscription's irony is total. Ozymandias intended 'despair' to mean: despair at my greatness. But surrounded by empty desert and rubble, it becomes an instruction to despair at the vanity of all human achievement. Shelley's most direct attack on tyrannical pretension.`},
-      {phrase:'colossal Wreck',fullQuote:'Round the decay / Of that colossal Wreck, boundless and bare',location:'Lines 12–13',blank:'Wreck',analysis:`'Colossal Wreck' is an oxymoronic pairing. 'Colossal' suggests enormity and grandeur; 'Wreck' suggests total destruction and failure. The collision of these two words captures the poem's whole argument: great ambition, total ruin.`},
-      {phrase:'boundless and bare',fullQuote:'Round the decay / Of that colossal Wreck, boundless and bare',location:'Lines 12–13',blank:'boundless',analysis:`The alliteration of 'boundless and bare' draws attention to the desert's limitless emptiness. 'Boundless' suggests nature is infinite and indifferent; 'bare' that it has stripped everything away. Ozymandias's legacy has been entirely erased.`},
-      {phrase:'lone and level sands',fullQuote:'The lone and level sands stretch far away',location:'Final line',blank:'lone',analysis:`The sibilance of 'lone', 'level', 'sands' and 'stretch' creates a slow, whispering, mournful sound mimicking the vast emptiness of the desert. 'Lone' suggests abandonment; 'level' that the sand has reclaimed and flattened everything. Nature, not the tyrant, has the last word.`},
+      {phrase:'vast and trunkless legs',fullQuote:'Two vast and trunkless legs of stone / Stand in the desert',location:'Lines 1–2',blank:'trunkless',analysis:"'Vast' hints at Ozymandias's former ambition, but 'trunkless' immediately undercuts it — what remains is incomplete and purposeless. The legs without a body are absurd and deflating. The greater the claim to power, the more pathetic the ruin."},
+      {phrase:'sneer of cold command',fullQuote:"Half sunk a shattered visage lies, whose frown, / And wrinkled lip, and sneer of cold command",location:'Lines 3–4',blank:'cold',analysis:"'Sneer of cold command' suggests a ruler so accustomed to obedience that cruelty became his natural expression. Yet this imperious face now lies half-buried in sand, unable to command anything. The arrogance is preserved in stone even as the power it represents has dissolved."},
+      {phrase:'sculptor well those passions read',fullQuote:'Tell that its sculptor well those passions read / Which yet survive',location:'Lines 6–7',blank:'sculptor',analysis:"The sculptor — an artist — has outlasted the tyrant. 'Well those passions read' means the sculptor understood and captured Ozymandias's character truthfully. This is Shelley asserting the power of art over political power: the artist's work endures where the king's empire does not."},
+      {phrase:'which yet survive',fullQuote:'Which yet survive, stamped on these lifeless things',location:'Line 7',blank:'survive',analysis:"'Survive' is quietly triumphant. The passions, arrogance, and cruelty of Ozymandias survive — but only in art. The irony is that what outlasts him is not his power but the record of his vanity, preserved by the sculptor he likely considered beneath him."},
+      {phrase:'King of Kings',fullQuote:'My name is Ozymandias, King of Kings',location:'Line 10',blank:'King',analysis:"The grandiose superlative 'King of Kings' amplifies the fall. The higher the claim, the greater the irony of the surrounding ruin. The biblical echo (used of Christ) hints at blasphemous overreach — Ozymandias compared himself to a god, and the desert is his answer."},
+      {phrase:'Look on my Works, ye Mighty, and despair!',fullQuote:'Look on my Works, ye Mighty, and despair!',location:'Line 11',blank:'despair',analysis:"The inscription's irony is total. Ozymandias intended 'despair' to mean: despair at my greatness. But surrounded by empty desert and rubble, it becomes an instruction to despair at the vanity of all human achievement. Shelley's most direct attack on tyrannical pretension."},
+      {phrase:'colossal Wreck',fullQuote:"Round the decay / Of that colossal Wreck, boundless and bare",location:'Lines 12–13',blank:'Wreck',analysis:"'Colossal Wreck' is an oxymoronic pairing. 'Colossal' suggests enormity and grandeur; 'Wreck' suggests total destruction and failure. The collision of these two words captures the poem's whole argument: great ambition, total ruin."},
+      {phrase:'boundless and bare',fullQuote:"Round the decay / Of that colossal Wreck, boundless and bare",location:'Lines 12–13',blank:'boundless',analysis:"The alliteration of 'boundless and bare' draws attention to the desert's limitless emptiness. 'Boundless' suggests nature is infinite and indifferent; 'bare' that it has stripped everything away. Ozymandias's legacy has been entirely erased."},
+      {phrase:'lone and level sands',fullQuote:'The lone and level sands stretch far away',location:'Final line',blank:'lone',analysis:"The sibilance of 'lone', 'level', 'sands' and 'stretch' creates a slow, whispering, mournful sound mimicking the vast emptiness of the desert. 'Lone' suggests abandonment; 'level' that the sand has reclaimed and flattened everything. Nature, not the tyrant, has the last word."},
     ]
   },
   {
@@ -295,21 +433,21 @@ const POEMS = [
     snippet:'some corner of a foreign field / That is for ever England',
     context:`The Soldier was written by Rupert Brooke in 1914, shortly after the outbreak of World War One. Published in 1914 and Other Poems (1915). Brooke died in 1915 of blood poisoning on a hospital ship before seeing active combat, lending the poem unintentional but powerful irony.\n\nThe poem is written in the first person — a soldier speaking about his own death without fear. It is a Petrarchan sonnet: 14 lines divided into an octave (8 lines) and a sestet (6 lines). The octave focuses on the physical — the soldier's body becoming part of English soil. The sestet shifts to the spiritual — his soul returning to an eternal English heaven. Central themes include patriotism; the romanticisation of sacrifice; England as an idealised homeland. The poem represents the pre-war idealistic attitude — in sharp contrast to later War Poets such as Wilfred Owen.`,
     contextQuestions:[
-      {q:'When was The Soldier written, and what irony surrounds Brooke himself?',a:'Written in 1914 at the outbreak of WWI. Brooke died in 1915 of blood poisoning before seeing combat — making the poem\'s serene treatment of death unintentionally ironic.'},
+      {q:'When was The Soldier written, and what irony surrounds Brooke himself?',a:"Written in 1914 at the outbreak of WWI. Brooke died in 1915 of blood poisoning before seeing combat — making the poem's serene treatment of death unintentionally ironic."},
       {q:'What is the form and structure of the poem?',a:'A Petrarchan (Italian) sonnet: 14 lines split into an octave (8 lines) and a sestet (6 lines), with rhyme scheme ABAB CDCD / EFGEFG.'},
-      {q:'What is the difference in focus between the octave and the sestet?',a:'The octave focuses on the physical — the soldier\'s body becoming part of English soil. The sestet shifts to the spiritual — his soul returning to an eternal English heaven.'},
-      {q:'How does the poem\'s voice and opening word create a specific effect?',a:'Written in the first person. The conditional "If" opens the poem — the soldier speaks of death as a possibility without fear. "Think only this of me" is almost controlling, directing the reader toward a comforting interpretation of his sacrifice.'},
+      {q:'What is the difference in focus between the octave and the sestet?',a:"The octave focuses on the physical — the soldier's body becoming part of English soil. The sestet shifts to the spiritual — his soul returning to an eternal English heaven."},
+      {q:"How does the poem's voice and opening word create a specific effect?",a:'Written in the first person. The conditional "If" opens the poem — the soldier speaks of death as a possibility without fear. "Think only this of me" is almost controlling, directing the reader toward a comforting interpretation of his sacrifice.'},
       {q:'What are the central themes?',a:'Patriotism and nationalism; the romanticisation of war and sacrifice; England as an idealised, almost sacred homeland; mortality and the afterlife; identity persisting beyond death.'},
       {q:'How does The Soldier contrast with later war poetry?',a:'It represents the idealistic pre-war attitude — serene, noble, beautiful. Later poets like Wilfred Owen depicted the brutal, horrific reality of the trenches in direct contrast.'},
     ],
     quotes:[
-      {phrase:'think only this of me',fullQuote:'If I should die, think only this of me',location:'Line 1',blank:'only',analysis:`The instruction to 'think only this' is almost controlling — the soldier directs the reader toward one specific, comforting interpretation of his death. The adverb 'only' excludes doubt, grief, or horror. Combined with the conditional 'If', the soldier speaks of death without fear.`},
-      {phrase:'for ever England',fullQuote:'some corner of a foreign field / That is for ever England',location:'Lines 2–3',blank:'England',analysis:`One of the most famous lines in English war poetry. 'For ever England' transforms death into a form of territorial permanence — the soldier does not die; he simply relocates England. The juxtaposition of 'foreign field' with 'England' makes dying abroad an act of expansion rather than loss.`},
-      {phrase:'A dust whom England bore, shaped, made aware',fullQuote:'A dust whom England bore, shaped, made aware',location:'Lines 5–6',blank:'bore',analysis:`Brooke reduces the soldier to 'dust' — humbling and physical — yet immediately elevates this with three verbs: 'bore, shaped, made aware.' England is personified as a mother who gave birth to, formed, and educated him. The triplet rhythm gives the line a stately, almost liturgical quality.`},
-      {phrase:'blest by suns of home',fullQuote:'Washed by the rivers, blest by suns of home',location:'Line 8',blank:'blest',analysis:`'Blest' (blessed) makes the language quasi-religious, presenting England almost as a sacred place. The natural imagery — rivers, suns — suggests England's landscape has shaped the soldier's very being. 'Home' grounds the idealism in something intimate before the sestet lifts into the spiritual.`},
-      {phrase:'all evil shed away',fullQuote:'this heart, all evil shed away',location:'Sestet, Line 9',blank:'evil',analysis:`'All evil shed away' suggests death as a kind of purification — war becomes a spiritual cleansing. This presents sacrifice not as horrific loss but as a transcendent, almost sacramental act. Characteristic of the idealised pre-war attitude: death in battle is ennobling rather than wasteful.`},
-      {phrase:'pulse in the eternal mind',fullQuote:'A pulse in the eternal mind, no less',location:'Sestet, Line 10',blank:'eternal',analysis:`'A pulse in the eternal mind' implies the soldier's consciousness merging with something divine or universal after death. 'Pulse' — a heartbeat — suggests continued life, not ending. 'Eternal mind' presents death not as oblivion but as transcendence into something infinite.`},
-      {phrase:'English heaven',fullQuote:'In hearts at peace, under an English heaven',location:'Final line',blank:'English',analysis:`'English heaven' completes the poem's vision of a nationalised afterlife. The soldier does not merely go to heaven — he goes to an English heaven. His identity, shaped entirely by England in life, remains intact in death. 'Hearts at peace' contrasts with the violence of war, offering the reader serenity as the poem's final image.`},
+      {phrase:'think only this of me',fullQuote:'If I should die, think only this of me',location:'Line 1',blank:'only',analysis:"The instruction to 'think only this' is almost controlling — the soldier directs the reader toward one specific, comforting interpretation of his death. The adverb 'only' excludes doubt, grief, or horror. Combined with the conditional 'If', the soldier speaks of death without fear."},
+      {phrase:'for ever England',fullQuote:'some corner of a foreign field / That is for ever England',location:'Lines 2–3',blank:'England',analysis:"One of the most famous lines in English war poetry. 'For ever England' transforms death into a form of territorial permanence — the soldier does not die; he simply relocates England. The juxtaposition of 'foreign field' with 'England' makes dying abroad an act of expansion rather than loss."},
+      {phrase:'A dust whom England bore, shaped, made aware',fullQuote:'A dust whom England bore, shaped, made aware',location:'Lines 5–6',blank:'bore',analysis:"Brooke reduces the soldier to 'dust' — humbling and physical — yet immediately elevates this with three verbs: 'bore, shaped, made aware.' England is personified as a mother who gave birth to, formed, and educated him. The triplet rhythm gives the line a stately, almost liturgical quality."},
+      {phrase:'blest by suns of home',fullQuote:'Washed by the rivers, blest by suns of home',location:'Line 8',blank:'blest',analysis:"'Blest' (blessed) makes the language quasi-religious, presenting England almost as a sacred place. The natural imagery — rivers, suns — suggests England's landscape has shaped the soldier's very being. 'Home' grounds the idealism in something intimate before the sestet lifts into the spiritual."},
+      {phrase:'all evil shed away',fullQuote:'this heart, all evil shed away',location:'Sestet, Line 9',blank:'evil',analysis:"'All evil shed away' suggests death as a kind of purification — war becomes a spiritual cleansing. This presents sacrifice not as horrific loss but as a transcendent, almost sacramental act. Characteristic of the idealised pre-war attitude: death in battle is ennobling rather than wasteful."},
+      {phrase:'pulse in the eternal mind',fullQuote:'A pulse in the eternal mind, no less',location:'Sestet, Line 10',blank:'eternal',analysis:"'A pulse in the eternal mind' implies the soldier's consciousness merging with something divine or universal after death. 'Pulse' — a heartbeat — suggests continued life, not ending. 'Eternal mind' presents death not as oblivion but as transcendence into something infinite."},
+      {phrase:'English heaven',fullQuote:'In hearts at peace, under an English heaven',location:'Final line',blank:'English',analysis:"'English heaven' completes the poem's vision of a nationalised afterlife. The soldier does not merely go to heaven — he goes to an English heaven. His identity, shaped entirely by England in life, remains intact in death. 'Hearts at peace' contrasts with the violence of war, offering the reader serenity as the poem's final image."},
     ]
   },
   {
@@ -318,21 +456,21 @@ const POEMS = [
     context:`The Manhunt is from Simon Armitage's 2008 collection The Not Dead, written to accompany a Channel 4 documentary. The poem is written from the perspective of Laura Beddoes, the wife of Eddie Beddoes, a soldier who served in Bosnia and returned with severe physical and psychological wounds — including PTSD. The title works on multiple levels: literally, the wife's painstaking physical exploration of her husband's injured body; metaphorically, her search for the man she once knew, lost to the trauma of war.\n\nArmitage uses an extended metaphor comparing the husband's body to a damaged machine or landscape, reflecting how war has dehumanised him. Each stanza introduces a new body part — mirroring the slow, fragile process of reconnection. Central themes include the lasting psychological damage of war, the limits of intimacy, and the emotional distance that trauma creates within relationships.`,
     contextQuestions:[
       {q:'Who is the poem about and what is its origin?',a:'Written from the perspective of Laura Beddoes, wife of Eddie Beddoes, a soldier who served in Bosnia. It accompanied a Channel 4 documentary called The Not Dead (2008).'},
-      {q:'What are the two meanings of the title "The Manhunt"?',a:'Literally: the wife\'s painstaking physical exploration of her husband\'s injured body. Metaphorically: her search for the man she once knew, lost to the trauma of war.'},
-      {q:'What extended metaphor does Armitage use throughout?',a:'The husband\'s body is compared to a damaged machine or landscape — reflecting how war has dehumanised him and reduced him to broken, malfunctioning parts.'},
-      {q:'How does the poem\'s structure reflect its themes?',a:'Each stanza introduces a new body part — mirroring the slow, fragile, incremental process of physical and emotional reconnection.'},
+      {q:'What are the two meanings of the title "The Manhunt"?',a:"Literally: the wife's painstaking physical exploration of her husband's injured body. Metaphorically: her search for the man she once knew, lost to the trauma of war."},
+      {q:'What extended metaphor does Armitage use throughout?',a:"The husband's body is compared to a damaged machine or landscape — reflecting how war has dehumanised him and reduced him to broken, malfunctioning parts."},
+      {q:"How does the poem's structure reflect its themes?",a:'Each stanza introduces a new body part — mirroring the slow, fragile, incremental process of physical and emotional reconnection.'},
       {q:'What are the central themes?',a:'The lasting psychological damage of war (PTSD); the limits of intimacy; the emotional distance trauma creates in relationships; the domestic cost of conflict.'},
       {q:'How does the ending encapsulate the central theme?',a:'"Then, and only then, did I come close" — after all the exploration, she comes close but never fully reaches him. War creates a distance that love can approach but perhaps never fully bridge.'},
     ],
     quotes:[
-      {phrase:'frozen river',fullQuote:'the frozen river which ran through his face',location:'Early stanzas',blank:'frozen',analysis:`'Frozen river' suggests something once fluid and full of life — his expressions, emotions, warmth — has been stopped and stilled by trauma. Its freezing evokes the way war has numbed and immobilised him. The image also implies a scar running across his face, linking physical injury to emotional shutdown.`},
-      {phrase:'blown hinge',fullQuote:'the blown hinge of his lower jaw',location:'Early stanzas',blank:'blown',analysis:`'Hinge' strips the body of humanity, reducing it to a broken piece of machinery. This dehumanising effect is central to Armitage's critique of war: it turns men into objects that malfunction. 'Blown' carries the violence of an explosion. The jaw's inability to function also suggests difficulty communicating — reinforcing the emotional distance between husband and wife.`},
-      {phrase:'parachute silk',fullQuote:'the parachute silk of his punctured lung',location:'Middle stanzas',blank:'parachute',analysis:`'Parachute silk' is delicate, light, almost beautiful — yet it describes something catastrophically damaged. The tenderness of the simile against the brutality of 'punctured' captures the poem's central tension: intimacy existing alongside irreparable injury. Parachute silk also links directly to military imagery.`},
-      {phrase:'punctured lung',fullQuote:'the parachute silk of his punctured lung',location:'Middle stanzas',blank:'punctured',analysis:`'Punctured' is a brutal, violent verb used as an adjective — it denotes something pierced, deflated, irrevocably damaged. The lung, essential for breath and life, is 'punctured' rather than healed. The word refuses to soften the injury, contrasting sharply with the delicate 'parachute silk' that precedes it.`},
-      {phrase:'grazed heart',fullQuote:'and feel the hurt / of his grazed heart',location:'Middle stanzas',blank:'grazed',analysis:`The heart is usually a symbol of love and emotional life, but here it is 'grazed' — wounded, rawly sensitive. 'Grazed' is softer than 'shattered' or 'broken': the wound is not dramatic but persistent and painful. The enjambment forces a pause on 'hurt', giving it weight before the cause is revealed. This reflects the nature of PTSD — a wound not always visible but constantly felt.`},
-      {phrase:'foetus of metal',fullQuote:'the foetus of metal beneath his chest',location:'Later stanzas',blank:'foetus',analysis:`The comparison of the lodged bullet to a 'foetus' is deeply unsettling. A foetus represents new life and growth; here it is made of metal — cold, inert, and deadly. This paradox suggests the bullet has become a permanent, almost organic part of him, just as trauma embeds itself in the mind and cannot be removed.`},
-      {phrase:'tightened and closed',fullQuote:'every nerve in his body had tightened and closed',location:'Final lines',blank:'tightened',analysis:`'Tightened and closed' describes the body's total defensive shutdown — every nerve guarding against further pain. The verbs suggest a system so overwhelmed by trauma it can no longer open up or relax. This physical image also conveys the psychological state of PTSD: the inability to be vulnerable or connect.`},
-      {phrase:'then, and only then, did I come close',fullQuote:'Then, and only then, did I come close.',location:'Final line',blank:'close',analysis:`The repetition of 'then, and only then' gives a sense of hard-won understanding after enormous effort. Yet 'come close' denies completeness — she comes close, but never fully reaches him. This quietly devastating ending encapsulates the poem's central theme: war creates a distance that love can approach, but perhaps never fully bridge.`},
+      {phrase:'frozen river',fullQuote:'the frozen river which ran through his face',location:'Early stanzas',blank:'frozen',analysis:"'Frozen river' suggests something once fluid and full of life — his expressions, emotions, warmth — has been stopped and stilled by trauma. Its freezing evokes the way war has numbed and immobilised him. The image also implies a scar running across his face, linking physical injury to emotional shutdown."},
+      {phrase:'blown hinge',fullQuote:'the blown hinge of his lower jaw',location:'Early stanzas',blank:'blown',analysis:"'Hinge' strips the body of humanity, reducing it to a broken piece of machinery. This dehumanising effect is central to Armitage's critique of war: it turns men into objects that malfunction. 'Blown' carries the violence of an explosion. The jaw's inability to function also suggests difficulty communicating — reinforcing the emotional distance between husband and wife."},
+      {phrase:'parachute silk',fullQuote:'the parachute silk of his punctured lung',location:'Middle stanzas',blank:'parachute',analysis:"'Parachute silk' is delicate, light, almost beautiful — yet it describes something catastrophically damaged. The tenderness of the simile against the brutality of 'punctured' captures the poem's central tension: intimacy existing alongside irreparable injury. Parachute silk also links directly to military imagery."},
+      {phrase:'punctured lung',fullQuote:'the parachute silk of his punctured lung',location:'Middle stanzas',blank:'punctured',analysis:"'Punctured' is a brutal, violent verb used as an adjective — it denotes something pierced, deflated, irrevocably damaged. The lung, essential for breath and life, is 'punctured' rather than healed. The word refuses to soften the injury, contrasting sharply with the delicate 'parachute silk' that precedes it."},
+      {phrase:'grazed heart',fullQuote:'and feel the hurt / of his grazed heart',location:'Middle stanzas',blank:'grazed',analysis:"The heart is usually a symbol of love and emotional life, but here it is 'grazed' — wounded, rawly sensitive. 'Grazed' is softer than 'shattered' or 'broken': the wound is not dramatic but persistent and painful. The enjambment forces a pause on 'hurt', giving it weight before the cause is revealed. This reflects the nature of PTSD — a wound not always visible but constantly felt."},
+      {phrase:'foetus of metal',fullQuote:'the foetus of metal beneath his chest',location:'Later stanzas',blank:'foetus',analysis:"The comparison of the lodged bullet to a 'foetus' is deeply unsettling. A foetus represents new life and growth; here it is made of metal — cold, inert, and deadly. This paradox suggests the bullet has become a permanent, almost organic part of him, just as trauma embeds itself in the mind and cannot be removed."},
+      {phrase:'tightened and closed',fullQuote:'every nerve in his body had tightened and closed',location:'Final lines',blank:'tightened',analysis:"'Tightened and closed' describes the body's total defensive shutdown — every nerve guarding against further pain. The verbs suggest a system so overwhelmed by trauma it can no longer open up or relax. This physical image also conveys the psychological state of PTSD: the inability to be vulnerable or connect."},
+      {phrase:'then, and only then, did I come close',fullQuote:'Then, and only then, did I come close.',location:'Final line',blank:'close',analysis:"The repetition of 'then, and only then' gives a sense of hard-won understanding after enormous effort. Yet 'come close' denies completeness — she comes close, but never fully reaches him. This quietly devastating ending encapsulates the poem's central theme: war creates a distance that love can approach, but perhaps never fully bridge."},
     ]
   }
 ];
@@ -344,166 +482,184 @@ const AIC = [
   {
     id:'birling', title:'Arthur Birling', role:'Patriarch · Businessman · Social Climber',
     snippet:'A man has to mind his own business and look after himself and his own.',
-    context:`Arthur Birling is a wealthy, self-made businessman and the patriarch of the Birling family. Set in 1912, he represents the capitalist upper-middle class that Priestley viewed as morally bankrupt and dangerously complacent. Birling has recently been Lord Mayor of Brumley and is hoping for a knighthood, revealing his obsession with social status over genuine virtue. He married above himself — Sybil comes from a higher social standing — suggesting his wealth is relatively new money.\n\nPriestley uses Birling as a vehicle for dramatic irony: his confident predictions about the Titanic being unsinkable, the impossibility of war, and the absurdity of collective responsibility are all proven catastrophically wrong to a 1945 audience who had lived through both. Birling is the character least changed by the Inspector's visit — his primary concern is avoiding a 'public scandal'. He represents the old order that Priestley argues must be dismantled for society to progress.`,
+    context:"Arthur Birling is a wealthy, self-made businessman and the patriarch of the Birling family. Set in 1912, he represents the capitalist upper-middle class that Priestley viewed as morally bankrupt and dangerously complacent. Birling has recently been Lord Mayor of Brumley and is hoping for a knighthood, revealing his obsession with social status over genuine virtue. He married above himself — Sybil comes from a higher social standing — suggesting his wealth is relatively new money.\n\nPriestley uses Birling as a vehicle for dramatic irony: his confident predictions about the Titanic being unsinkable, the impossibility of war, and the absurdity of collective responsibility are all proven catastrophically wrong to a 1945 audience who had lived through both. Birling is the character least changed by the Inspector's visit — his primary concern is avoiding a 'public scandal'. He represents the old order that Priestley argues must be dismantled for society to progress.",
     contextQuestions:[
-      {q:'What does Birling\'s hope for a knighthood reveal about him?',a:'It reveals his obsession with social status and respectability over genuine virtue — he values reputation above moral integrity.'},
+      {q:"What does Birling's hope for a knighthood reveal about him?",a:'It reveals his obsession with social status and respectability over genuine virtue — he values reputation above moral integrity.'},
       {q:'How does Priestley use dramatic irony with Birling?',a:'Birling confidently predicts the Titanic is unsinkable and that war is impossible — both catastrophically wrong to a 1945 audience, immediately undermining his authority and signalling his ideology is dangerous.'},
-      {q:'What does Birling\'s firing of Eva Smith represent?',a:'He fired her for leading a workers\' strike — prioritising profit over human welfare. It is the first link in the chain of events that led to her death.'},
-      {q:'What is Birling\'s role at the end of the play?',a:'He is the character least changed. His primary concern is avoiding a "public scandal" that could damage his business prospects and knighthood — he undergoes no moral transformation.'},
+      {q:"What does Birling's firing of Eva Smith represent?",a:"He fired her for leading a workers' strike — prioritising profit over human welfare. It is the first link in the chain of events that led to her death."},
+      {q:"What is Birling's role at the end of the play?",a:'He is the character least changed. His primary concern is avoiding a "public scandal" that could damage his business prospects and knighthood — he undergoes no moral transformation.'},
       {q:'What is the significance of Birling as a "foil" to the Inspector?',a:'Every value Birling holds — individualism, capitalism, self-interest — is the direct opposite of what the Inspector represents: community, responsibility, socialism.'},
-      {q:'What does "hubris" mean and how does it apply to Birling?',a:'Hubris is excessive pride that blinds a character to their own flaws. Birling\'s arrogance and refusal to accept responsibility mean he is incapable of growth — he ends the play exactly as he began it.'},
+      {q:'What does "hubris" mean and how does it apply to Birling?',a:"Hubris is excessive pride that blinds a character to their own flaws. Birling's arrogance and refusal to accept responsibility mean he is incapable of growth — he ends the play exactly as he began it."},
     ],
     quotes:[
-      {phrase:'mind his own business and look after himself and his own',fullQuote:'A man has to mind his own business and look after himself and his own.',location:'Act 1',blank:'business',analysis:`Birling's capitalist philosophy in a single sentence. 'His own business' and 'his own' reduce all moral obligation to personal interest. This is directly contradicted by the Inspector's message of collective responsibility — and Priestley makes clear whose view the play endorses.`},
-      {phrase:'quite justified',fullQuote:'I was quite justified. A man has to look after his own business interests.',location:'Act 1',blank:'justified',analysis:`The word 'justified' reveals the depth of Birling's moral blindness — he has no doubt whatsoever that sacking Eva Smith was the right thing to do. He prioritises profit over human welfare without hesitation or self-examination.`},
-      {phrase:'unsinkable, absolutely unsinkable',fullQuote:'The Titanic — she sails next week — unsinkable, absolutely unsinkable.',location:'Act 1',blank:'unsinkable',analysis:`Devastating dramatic irony. To a 1945 audience who knew the Titanic sank on its maiden voyage, this statement immediately destroys Birling's credibility. The repetition of 'unsinkable' amplifies his complacent certainty and signals that his judgement is fatally flawed.`},
-      {phrase:'peace and prosperity and rapid progress everywhere',fullQuote:'There\'ll be peace and prosperity and rapid progress everywhere.',location:'Act 1',blank:'progress',analysis:`Further dramatic irony predating WWI and WWII. The alliterative triplet ('peace', 'prosperity', 'progress') gives Birling's speech a false rhetorical confidence. Priestley shows that Birling is not merely wrong but blind to the catastrophe his class is actively creating.`},
-      {phrase:'worked hard for the position I\'ve managed to reach',fullQuote:'I\'ve worked hard for the position I\'ve managed to reach.',location:'Act 2',blank:'position',analysis:`Reveals his obsession with self-made status. The implication is that those who haven't 'worked' as he has don't deserve support — his work ethic becomes a weapon against the poor rather than a source of genuine pride.`},
-      {phrase:'very awkward',fullQuote:'If we\'re all responsible for everything that happened to everybody we\'d had any dealings with, it would be very awkward.',location:'Act 3',blank:'awkward',analysis:`The word 'awkward' is Priestley's most damning choice. Birling reduces the moral horror of collective responsibility — the idea that his actions contributed to a woman's death — to a social inconvenience. The trivialising language exposes the complete absence of moral imagination.`},
+      {phrase:'mind his own business and look after himself and his own',fullQuote:'A man has to mind his own business and look after himself and his own.',location:'Act 1',blank:'business',analysis:"Birling's capitalist philosophy in a single sentence. 'His own business' and 'his own' reduce all moral obligation to personal interest. This is directly contradicted by the Inspector's message of collective responsibility — and Priestley makes clear whose view the play endorses."},
+      {phrase:'quite justified',fullQuote:'I was quite justified. A man has to look after his own business interests.',location:'Act 1',blank:'justified',analysis:"The word 'justified' reveals the depth of Birling's moral blindness — he has no doubt whatsoever that sacking Eva Smith was the right thing to do. He prioritises profit over human welfare without hesitation or self-examination."},
+      {phrase:'unsinkable, absolutely unsinkable',fullQuote:'The Titanic — she sails next week — unsinkable, absolutely unsinkable.',location:'Act 1',blank:'unsinkable',analysis:"Devastating dramatic irony. To a 1945 audience who knew the Titanic sank on its maiden voyage, this statement immediately destroys Birling's credibility. The repetition of 'unsinkable' amplifies his complacent certainty and signals that his judgement is fatally flawed."},
+      {phrase:'peace and prosperity and rapid progress everywhere',fullQuote:"There'll be peace and prosperity and rapid progress everywhere.",location:'Act 1',blank:'progress',analysis:"Further dramatic irony predating WWI and WWII. The alliterative triplet ('peace', 'prosperity', 'progress') gives Birling's speech a false rhetorical confidence. Priestley shows that Birling is not merely wrong but blind to the catastrophe his class is actively creating."},
+      {phrase:"worked hard for the position I've managed to reach",fullQuote:"I've worked hard for the position I've managed to reach.",location:'Act 2',blank:'position',analysis:"Reveals his obsession with self-made status. The implication is that those who haven't 'worked' as he has don't deserve support — his work ethic becomes a weapon against the poor rather than a source of genuine pride."},
+      {phrase:'very awkward',fullQuote:"If we're all responsible for everything that happened to everybody we'd had any dealings with, it would be very awkward.",location:'Act 3',blank:'awkward',analysis:"The word 'awkward' is Priestley's most damning choice. Birling reduces the moral horror of collective responsibility — the idea that his actions contributed to a woman's death — to a social inconvenience. The trivialising language exposes the complete absence of moral imagination."},
     ]
   },
   {
     id:'sybil', title:'Sybil Birling', role:'Matriarch · Social Superior · Moral Hypocrite',
     snippet:'I accept no blame for it at all.',
-    context:`Sybil Birling is Arthur's wife and the social superior of the family — she comes from a higher class than her husband. She sits on the Brumley Women's Charity Organisation, a committee that reviews cases of women in need. In the rigid Edwardian class structure of 1912, Sybil represents the aristocratic upper class who uses the language of respectability and morality to mask self-interest and class prejudice. Her charity work is deeply performative — she uses it to reinforce class hierarchies rather than genuinely help the dispossessed.\n\nSybil's key action is her rejection of Eva Smith's appeal to the charity. Eva — then pregnant with Eric's child — was refused aid partly because Sybil was prejudiced against a working-class woman claiming to be married, and partly because Eva had used the Birling name. Like Arthur, Sybil undergoes no moral change by the play's close, embodying Priestley's warning that the older generation will resist collective responsibility unless forced to change by external circumstances.`,
+    context:"Sybil Birling is Arthur's wife and the social superior of the family — she comes from a higher class than her husband. She sits on the Brumley Women's Charity Organisation, a committee that reviews cases of women in need. In the rigid Edwardian class structure of 1912, Sybil represents the aristocratic upper class who uses the language of respectability and morality to mask self-interest and class prejudice. Her charity work is deeply performative — she uses it to reinforce class hierarchies rather than genuinely help the dispossessed.\n\nSybil's key action is her rejection of Eva Smith's appeal to the charity. Eva — then pregnant with Eric's child — was refused aid partly because Sybil was prejudiced against a working-class woman claiming to be married, and partly because Eva had used the Birling name. Like Arthur, Sybil undergoes no moral change by the play's close, embodying Priestley's warning that the older generation will resist collective responsibility unless forced to change by external circumstances.",
     contextQuestions:[
-      {q:'What is Sybil\'s key action in the play and why is it significant?',a:'She rejected Eva Smith\'s appeal to the Brumley Women\'s Charity Organisation — denying aid to a desperate pregnant woman because of class prejudice. This is the final link in the chain of events that leads to Eva\'s death.'},
-      {q:'How does Priestley present Sybil\'s charity work?',a:'As performative virtue — a performance of goodness that reinforces class hierarchies rather than genuinely helping the dispossessed. This is Priestley\'s critique of bourgeois philanthropy.'},
-      {q:'What is the most devastating dramatic irony involving Sybil?',a:'She passionately insists the father of Eva\'s child must bear full responsibility — unknowingly condemning her own son Eric, building to the play\'s most devastating reversal.'},
-      {q:'How does Sybil differ from Arthur Birling?',a:'Where Arthur is blunt and greedy, Sybil hides behind propriety and social codes, making her refusals seem reasonable even as they lead directly to Eva\'s death. Her cold composure is itself a form of violence.'},
-      {q:'What does "patriarchal complicity" mean in relation to Sybil?',a:'Sybil upholds and enforces patriarchal norms — she dismisses Sheila\'s instincts, defends Gerald\'s infidelity, and protects Arthur\'s authority, making her an active participant in a system that oppresses women.'},
-      {q:'How does Sybil represent Priestley\'s warning about the older generation?',a:'Like Arthur, she experiences no anagnorisis. Her inability to change represents the intransigence of the ruling class and Priestley\'s implicit argument that systemic — not merely individual — change is required.'},
+      {q:"What is Sybil's key action in the play and why is it significant?",a:"She rejected Eva Smith's appeal to the Brumley Women's Charity Organisation — denying aid to a desperate pregnant woman because of class prejudice. This is the final link in the chain of events that leads to Eva's death."},
+      {q:"How does Priestley present Sybil's charity work?",a:"As performative virtue — a performance of goodness that reinforces class hierarchies rather than genuinely helping the dispossessed. This is Priestley's critique of bourgeois philanthropy."},
+      {q:'What is the most devastating dramatic irony involving Sybil?',a:"She passionately insists the father of Eva's child must bear full responsibility — unknowingly condemning her own son Eric, building to the play's most devastating reversal."},
+      {q:'How does Sybil differ from Arthur Birling?',a:"Where Arthur is blunt and greedy, Sybil hides behind propriety and social codes, making her refusals seem reasonable even as they lead directly to Eva's death. Her cold composure is itself a form of violence."},
+      {q:'What does "patriarchal complicity" mean in relation to Sybil?',a:"Sybil upholds and enforces patriarchal norms — she dismisses Sheila's instincts, defends Gerald's infidelity, and protects Arthur's authority, making her an active participant in a system that oppresses women."},
+      {q:"How does Sybil represent Priestley's warning about the older generation?",a:"Like Arthur, she experiences no anagnorisis. Her inability to change represents the intransigence of the ruling class and Priestley's implicit argument that systemic — not merely individual — change is required."},
     ],
     quotes:[
-      {phrase:'I accept no blame for it at all',fullQuote:'I\'m sorry she should have come to such a horrible end. But I accept no blame for it at all.',location:'Act 2',blank:'blame',analysis:`Demonstrates moral detachment with surgical precision. The concession 'I\'m sorry' offers a performance of sympathy, immediately cancelled by 'I accept no blame for it at all.' The contrast exposes the emptiness of bourgeois compassion — grief without responsibility, pity without accountability.`},
-      {phrase:'simply absurd in a girl in her position',fullQuote:'She was claiming elaborate fine feelings and scruples that were simply absurd in a girl in her position.',location:'Act 2',blank:'absurd',analysis:`Reveals Sybil's class prejudice in its rawest form. She literally cannot conceive of a working-class woman having genuine moral integrity. The word 'absurd' dehumanises Eva's real feelings as pretension. Priestley uses this to critique the hypocrisy of charity that actively reinforces class hierarchy.`},
-      {phrase:'only had herself to blame',fullQuote:'I think she only had herself to blame.',location:'Act 2',blank:'blame',analysis:`Victim-blaming as a defence mechanism — Sybil entirely absolves herself of the consequences of her own decision by transferring all responsibility to Eva. The word 'only' performs the same trivialising function as Birling's 'awkward' — reducing a moral catastrophe to a simple matter of personal failing.`},
-      {phrase:'no power to make me change my mind',fullQuote:'You have no power to make me change my mind.',location:'Act 2',blank:'power',analysis:`Sybil views the Inspector's authority as illegitimate because it does not derive from social class. This is her most explicit statement of the belief that class hierarchy should determine who has the right to judge whom. It is also dramatically ironic — the Inspector has already determined her guilt.`},
-      {phrase:'he should be made an example of',fullQuote:'He should be made an example of. If the girl\'s death is due to anybody, then it\'s due to him.',location:'Act 2',blank:'example',analysis:`The play's most devastating dramatic irony. Sybil unknowingly condemns her own son Eric as the person most responsible for Eva's death. Her certainty and righteous indignation make the reversal, when Eric is revealed, all the more shattering — she has been building the case against her own child.`},
-      {phrase:'ought not to talk business on an occasion like this',fullQuote:'Arthur, I don\'t think you ought to talk business on an occasion like this.',location:'Act 1',blank:'business',analysis:`Preoccupied with social propriety even at a family celebration. Her concern is with the performance of correct behaviour rather than its substance. This reveals that Sybil's values are entirely performative — what matters is not what is right but what appears appropriate.`},
+      {phrase:'I accept no blame for it at all',fullQuote:"I'm sorry she should have come to such a horrible end. But I accept no blame for it at all.",location:'Act 2',blank:'blame',analysis:"Demonstrates moral detachment with surgical precision. The concession 'I'm sorry' offers a performance of sympathy, immediately cancelled by 'I accept no blame for it at all.' The contrast exposes the emptiness of bourgeois compassion — grief without responsibility, pity without accountability."},
+      {phrase:'simply absurd in a girl in her position',fullQuote:'She was claiming elaborate fine feelings and scruples that were simply absurd in a girl in her position.',location:'Act 2',blank:'absurd',analysis:"Reveals Sybil's class prejudice in its rawest form. She literally cannot conceive of a working-class woman having genuine moral integrity. The word 'absurd' dehumanises Eva's real feelings as pretension. Priestley uses this to critique the hypocrisy of charity that actively reinforces class hierarchy."},
+      {phrase:'only had herself to blame',fullQuote:'I think she only had herself to blame.',location:'Act 2',blank:'blame',analysis:"Victim-blaming as a defence mechanism — Sybil entirely absolves herself of the consequences of her own decision by transferring all responsibility to Eva. The word 'only' performs the same trivialising function as Birling's 'awkward' — reducing a moral catastrophe to a simple matter of personal failing."},
+      {phrase:'no power to make me change my mind',fullQuote:'You have no power to make me change my mind.',location:'Act 2',blank:'power',analysis:"Sybil views the Inspector's authority as illegitimate because it does not derive from social class. This is her most explicit statement of the belief that class hierarchy should determine who has the right to judge whom. It is also dramatically ironic — the Inspector has already determined her guilt."},
+      {phrase:'he should be made an example of',fullQuote:"He should be made an example of. If the girl's death is due to anybody, then it's due to him.",location:'Act 2',blank:'example',analysis:"The play's most devastating dramatic irony. Sybil unknowingly condemns her own son Eric as the person most responsible for Eva's death. Her certainty and righteous indignation make the reversal, when Eric is revealed, all the more shattering — she has been building the case against her own child."},
+      {phrase:'ought not to talk business on an occasion like this',fullQuote:"Arthur, I don't think you ought to talk business on an occasion like this.",location:'Act 1',blank:'business',analysis:"Preoccupied with social propriety even at a family celebration. Her concern is with the performance of correct behaviour rather than its substance. This reveals that Sybil's values are entirely performative — what matters is not what is right but what appears appropriate."},
     ]
   },
   {
     id:'sheila', title:'Sheila Birling', role:'Daughter · Voice of the New Generation · Moral Conscience',
-    snippet:'You and I aren\'t the same people who sat down to dinner here.',
-    context:`Sheila is the Birlings' daughter, engaged to Gerald Croft at the play's opening. She is initially presented as 'very pleased with life and rather excited' — a portrait of upper-middle-class complacency and innocent privilege. Unlike her parents, Sheila is capable of genuine empathy and moral growth. Priestley uses her as a representative of the younger generation — one that has the capacity to learn from the past and build a more compassionate society, embodying his political hope for post-war Britain.\n\nSheila's responsibility is for having Eva Smith dismissed from Milwards, the department store, out of jealous spite. Unlike her parents, she immediately and genuinely accepts her guilt. She becomes the Inspector's closest ally, articulating his moral message more clearly than any other character. By the play's end, she refuses to return to comfortable illusions and refuses to simply reinstate the engagement with Gerald.`,
+    snippet:"You and I aren't the same people who sat down to dinner here.",
+    context:"Sheila is the Birlings' daughter, engaged to Gerald Croft at the play's opening. She is initially presented as 'very pleased with life and rather excited' — a portrait of upper-middle-class complacency and innocent privilege. Unlike her parents, Sheila is capable of genuine empathy and moral growth. Priestley uses her as a representative of the younger generation — one that has the capacity to learn from the past and build a more compassionate society, embodying his political hope for post-war Britain.\n\nSheila's responsibility is for having Eva Smith dismissed from Milwards, the department store, out of jealous spite. Unlike her parents, she immediately and genuinely accepts her guilt. She becomes the Inspector's closest ally, articulating his moral message more clearly than any other character. By the play's end, she refuses to return to comfortable illusions and refuses to simply reinstate the engagement with Gerald.",
     contextQuestions:[
-      {q:'What is Sheila\'s responsibility for Eva Smith\'s death?',a:'She had Eva dismissed from Milwards department store out of jealous spite — Eva was pretty, the dress suited her better, and Sheila was in a bad mood. She had the power to act on it.'},
-      {q:'What is "anagnorisis" and how does it apply to Sheila?',a:'Anagnorisis is a moment of self-realisation. Sheila undergoes the clearest anagnorisis of any character — her recognition of her own cruelty and class prejudice is immediate and permanent.'},
-      {q:'What is a "raisonneur" and how does Sheila function as one?',a:'A raisonneur is a character who articulates the author\'s own moral views. Sheila increasingly functions alongside the Inspector, challenging her parents\' rationalisations in accessible emotional terms.'},
-      {q:'How does Sheila represent Priestley\'s hope for society?',a:'She represents the younger generation\'s capacity to genuinely reject inherited values. Her refusal to pretend nothing happened embodies Priestley\'s belief that change is possible through education and conscience.'},
-      {q:'What is the "Bildungsroman element" of Sheila\'s arc?',a:'Her arc follows a compressed coming-of-age structure — she moves from naivety and privilege to moral awareness and independence within a single evening.'},
-      {q:'Why does Sheila refuse to accept Gerald\'s ring at the end?',a:'She refuses to return to comfortable illusions. Unlike Gerald, who reverts to self-protection, Sheila\'s transformation is permanent — she insists the evening\'s revelations cannot and should not be undone.'},
+      {q:"What is Sheila's responsibility for Eva Smith's death?",a:"She had Eva dismissed from Milwards department store out of jealous spite — Eva was pretty, the dress suited her better, and Sheila was in a bad mood. She had the power to act on it."},
+      {q:'What is "anagnorisis" and how does it apply to Sheila?',a:"Anagnorisis is a moment of self-realisation. Sheila undergoes the clearest anagnorisis of any character — her recognition of her own cruelty and class prejudice is immediate and permanent."},
+      {q:'What is a "raisonneur" and how does Sheila function as one?',a:"A raisonneur is a character who articulates the author's own moral views. Sheila increasingly functions alongside the Inspector, challenging her parents' rationalisations in accessible emotional terms."},
+      {q:"How does Sheila represent Priestley's hope for society?",a:"She represents the younger generation's capacity to genuinely reject inherited values. Her refusal to pretend nothing happened embodies Priestley's belief that change is possible through education and conscience."},
+      {q:"What is the 'Bildungsroman element' of Sheila's arc?",a:'Her arc follows a compressed coming-of-age structure — she moves from naivety and privilege to moral awareness and independence within a single evening.'},
+      {q:"Why does Sheila refuse to accept Gerald's ring at the end?",a:"She refuses to return to comfortable illusions. Unlike Gerald, who reverts to self-protection, Sheila's transformation is permanent — she insists the evening's revelations cannot and should not be undone."},
     ],
     quotes:[
-      {phrase:'I\'ll never, never do it again to anybody',fullQuote:'I\'ll never, never do it again to anybody.',location:'Act 1',blank:'never',analysis:`Genuine remorse and moral resolution. The repetition of 'never' emphasises authenticity — this is not a performance for the Inspector but a real vow. It stands in stark contrast to her parents' self-justification, and the doubled word gives it a quality of desperate sincerity.`},
-      {phrase:'we\'ll have to share our guilt',fullQuote:'You see, we have to share something. If there\'s nothing else, we\'ll have to share our guilt.',location:'Act 3',blank:'guilt',analysis:`Sheila articulates the play's central theme of collective responsibility with striking clarity. 'Share our guilt' transforms guilt from a private shame into a social bond — it is something that connects rather than isolates. She has fully absorbed and can now independently express the Inspector's socialist message.`},
-      {phrase:'giving us rope — so that we\'ll hang ourselves',fullQuote:'He\'s giving us rope — so that we\'ll hang ourselves.',location:'Act 2',blank:'rope',analysis:`Sheila intuitively understands the Inspector's method before anyone else. The metaphor of 'rope' to hang themselves reveals her moral intelligence — she sees that the Inspector's power lies not in accusation but in allowing the guilty to condemn themselves through their own words.`},
-      {phrase:'You and I aren\'t the same people who sat down to dinner here',fullQuote:'You and I aren\'t the same people who sat down to dinner here.',location:'Act 3',blank:'same',analysis:`Sheila explicitly acknowledges her own transformation. The statement refuses to allow regression — what has been revealed cannot be unrevealed. The 'dinner' marks the boundary between innocence and knowledge, before and after. This is the clearest statement in the play that genuine change is possible.`},
-      {phrase:'I know I\'m to blame — and I\'m desperately sorry',fullQuote:'I know I\'m to blame — and I\'m desperately sorry.',location:'Act 1',blank:'blame',analysis:`Unambiguous acceptance of responsibility. The adverb 'desperately' conveys the emotional weight of her guilt — this is not polite regret but genuine distress. In direct contrast to her mother's cold denial and her father's self-justification, Sheila's response shows what genuine moral awakening looks like.`},
-      {phrase:'build up a kind of wall between us and that girl',fullQuote:'You mustn\'t try to build up a kind of wall between us and that girl.',location:'Act 2',blank:'wall',analysis:`The metaphor of a 'wall' captures what her parents are trying to do — construct distance between themselves and their responsibility. Sheila recognises and names this mechanism, trying to prevent the moral regression she foresees. The verb 'build' suggests it takes active effort to maintain denial.`},
+      {phrase:"I'll never, never do it again to anybody",fullQuote:"I'll never, never do it again to anybody.",location:'Act 1',blank:'never',analysis:"Genuine remorse and moral resolution. The repetition of 'never' emphasises authenticity — this is not a performance for the Inspector but a real vow. It stands in stark contrast to her parents' self-justification, and the doubled word gives it a quality of desperate sincerity."},
+      {phrase:"we'll have to share our guilt",fullQuote:"You see, we have to share something. If there's nothing else, we'll have to share our guilt.",location:'Act 3',blank:'guilt',analysis:"Sheila articulates the play's central theme of collective responsibility with striking clarity. 'Share our guilt' transforms guilt from a private shame into a social bond — it is something that connects rather than isolates. She has fully absorbed and can now independently express the Inspector's socialist message."},
+      {phrase:"giving us rope — so that we'll hang ourselves",fullQuote:"He's giving us rope — so that we'll hang ourselves.",location:'Act 2',blank:'rope',analysis:"Sheila intuitively understands the Inspector's method before anyone else. The metaphor of 'rope' to hang themselves reveals her moral intelligence — she sees that the Inspector's power lies not in accusation but in allowing the guilty to condemn themselves through their own words."},
+      {phrase:"You and I aren't the same people who sat down to dinner here",fullQuote:"You and I aren't the same people who sat down to dinner here.",location:'Act 3',blank:'same',analysis:"Sheila explicitly acknowledges her own transformation. The statement refuses to allow regression — what has been revealed cannot be unrevealed. The 'dinner' marks the boundary between innocence and knowledge, before and after. This is the clearest statement in the play that genuine change is possible."},
+      {phrase:"I know I'm to blame — and I'm desperately sorry",fullQuote:"I know I'm to blame — and I'm desperately sorry.",location:'Act 1',blank:'blame',analysis:"Unambiguous acceptance of responsibility. The adverb 'desperately' conveys the emotional weight of her guilt — this is not polite regret but genuine distress. In direct contrast to her mother's cold denial and her father's self-justification, Sheila's response shows what genuine moral awakening looks like."},
+      {phrase:'build up a kind of wall between us and that girl',fullQuote:"You mustn't try to build up a kind of wall between us and that girl.",location:'Act 2',blank:'wall',analysis:"The metaphor of a 'wall' captures what her parents are trying to do — construct distance between themselves and their responsibility. Sheila recognises and names this mechanism, trying to prevent the moral regression she foresees. The verb 'build' suggests it takes active effort to maintain denial."},
     ]
   },
   {
     id:'eric', title:'Eric Birling', role:'Son · Alcoholic · Reluctant Rebel',
-    snippet:'And I say the girl\'s dead and we all helped to kill her — and that\'s what matters.',
-    context:`Eric is the Birlings' son, in his mid-twenties, 'not quite at ease, half shy, half assertive'. He is an alcoholic — a fact his family has been wilfully ignoring, reflecting the Birlings' broader habit of denying any uncomfortable truth. Eric embodies the contradictions of the privileged young man: he has a dormant social conscience yet also abuses his class privilege catastrophically in his treatment of Eva Smith — effectively assaulting her and then exploiting her vulnerability.\n\nEric's connection to Eva Smith is the most intimate and damaging: he had a sexual relationship with her (which begins with what the Inspector implies was coercion), she became pregnant, and he stole money from his father's business to support her — which Eva refused when she discovered it was stolen. His revelation is saved until Act Three, functioning as the play's final and most shocking disclosure.`,
+    snippet:"And I say the girl's dead and we all helped to kill her — and that's what matters.",
+    context:"Eric is the Birlings' son, in his mid-twenties, 'not quite at ease, half shy, half assertive'. He is an alcoholic — a fact his family has been wilfully ignoring, reflecting the Birlings' broader habit of denying any uncomfortable truth. Eric embodies the contradictions of the privileged young man: he has a dormant social conscience yet also abuses his class privilege catastrophically in his treatment of Eva Smith — effectively assaulting her and then exploiting her vulnerability.\n\nEric's connection to Eva Smith is the most intimate and damaging: he had a sexual relationship with her (which begins with what the Inspector implies was coercion), she became pregnant, and he stole money from his father's business to support her — which Eva refused when she discovered it was stolen. His revelation is saved until Act Three, functioning as the play's final and most shocking disclosure.",
     contextQuestions:[
-      {q:'What is Eric\'s relationship with Eva Smith and why is it the most damaging?',a:'He had a coercive sexual relationship with her, she became pregnant, and he stole money from his father\'s business to support her — which Eva refused when she discovered it was stolen. It is the most intimate and personally destructive connection.'},
-      {q:'How does Eric\'s alcoholism function symbolically?',a:'It symbolises the Birlings\' broader habit of ignoring social problems as long as they remain hidden. His family wilfully ignored it until it could no longer be ignored — mirroring their approach to social responsibility.'},
-      {q:'How does Eric\'s response to the Inspector differ from his parents\'?',a:'He accepts responsibility with raw self-hatred and does not minimise, deflect, or retreat into respectability. His shame is visceral, permanent, and marked by brutal self-honesty.'},
+      {q:"What is Eric's relationship with Eva Smith and why is it the most damaging?",a:"He had a coercive sexual relationship with her, she became pregnant, and he stole money from his father's business to support her — which Eva refused when she discovered it was stolen. It is the most intimate and personally destructive connection."},
+      {q:"How does Eric's alcoholism function symbolically?",a:"It symbolises the Birlings' broader habit of ignoring social problems as long as they remain hidden. His family wilfully ignored it until it could no longer be ignored — mirroring their approach to social responsibility."},
+      {q:"How does Eric's response to the Inspector differ from his parents'?",a:'He accepts responsibility with raw self-hatred and does not minimise, deflect, or retreat into respectability. His shame is visceral, permanent, and marked by brutal self-honesty.'},
       {q:'What dramatic irony involves Eric and Sybil?',a:'Sybil passionately condemns "the father of the child" as the truly guilty party — not realising she is condemning her own son. The audience begins to suspect this before the revelation.'},
-      {q:'How does Eric\'s class position enable his actions?',a:'He has access to money, social protection, and immunity that Eva does not. Priestley uses this to argue that class privilege is itself a structural form of violence.'},
-      {q:'What does Eric represent alongside Sheila?',a:'Together they represent Priestley\'s qualified hope — that the younger generation, confronted with the human cost of their privilege, can choose a fundamentally different path.'},
+      {q:"How does Eric's class position enable his actions?",a:'He has access to money, social protection, and immunity that Eva does not. Priestley uses this to argue that class privilege is itself a structural form of violence.'},
+      {q:'What does Eric represent alongside Sheila?',a:"Together they represent Priestley's qualified hope — that the younger generation, confronted with the human cost of their privilege, can choose a fundamentally different path."},
     ],
     quotes:[
-      {phrase:'I\'m not likely to forget',fullQuote:'I\'m not likely to forget.',location:'Act 3',blank:'forget',analysis:`Blunt, unadorned acceptance of guilt. There is no euphemism, no qualification, no self-justification. The flat statement 'I\'m not likely to forget' contrasts sharply with his parents' elaborate rationalisations — Eric has no interest in performing remorse, only in acknowledging it.`},
-      {phrase:'pretend now that nothing\'s really happened at all',fullQuote:'You\'re beginning to pretend now that nothing\'s really happened at all. And I can\'t see it like that.',location:'Act 3',blank:'pretend',analysis:`Eric names and rejects his parents' psychological defence mechanism. The word 'pretend' marks his moral clarity — he sees their regression as a deliberate choice, not a genuine misunderstanding. He aligns himself firmly with Sheila against the older generation's denial.`},
-      {phrase:'the girl\'s dead and we all helped to kill her',fullQuote:'And I say the girl\'s dead and we all helped to kill her — and that\'s what matters.',location:'Act 3',blank:'kill',analysis:`Eric mirrors the Inspector's central message directly. 'We all helped to kill her' distributes guilt across the whole family, refusing to allow any single scapegoat. The dash before 'and that\'s what matters' strips away all the procedural debates about whether Goole was a real inspector — Eric has grasped what actually counts.`},
-      {phrase:'she didn\'t want me to go seeing her. Said I made her feel worse',fullQuote:'She told me. She didn\'t want me to go seeing her. Said I made her feel worse.',location:'Act 3',blank:'worse',analysis:`Reveals Eva's moral courage and independence. Even in desperate circumstances — pregnant, penniless — she refused to be dependent on someone who had harmed her. The detail humanises Eva and deepens Eric's self-condemnation: even the woman he wronged had more integrity than he did.`},
-      {phrase:'I was in a state when a chap easily turns nasty — and I threatened to make a row',fullQuote:'I was in a state when a chap easily turns nasty — and I threatened to make a row.',location:'Act 3',blank:'nasty',analysis:`One of the play's most unflinching admissions. The casual phrase 'turns nasty' makes the coercive nature of Eric's behaviour explicit. He does not soften it with euphemism — 'threatened to make a row' acknowledges that force, not consent, was the basis of the encounter.`},
-      {phrase:'(miserably) I got her into trouble',fullQuote:'(miserably) I got her into trouble.',location:'Act 3',blank:'trouble',analysis:`The understatement carries enormous weight. 'Got her into trouble' is a colloquial phrase that might seem to minimise what happened — but the stage direction 'miserably' confirms this is authentic remorse, not evasion. The gap between the small words and the vast reality they describe is itself an expression of shame.`},
+      {phrase:"I'm not likely to forget",fullQuote:"I'm not likely to forget.",location:'Act 3',blank:'forget',analysis:"Blunt, unadorned acceptance of guilt. There is no euphemism, no qualification, no self-justification. The flat statement 'I'm not likely to forget' contrasts sharply with his parents' elaborate rationalisations — Eric has no interest in performing remorse, only in acknowledging it."},
+      {phrase:"pretend now that nothing's really happened at all",fullQuote:"You're beginning to pretend now that nothing's really happened at all. And I can't see it like that.",location:'Act 3',blank:'pretend',analysis:"Eric names and rejects his parents' psychological defence mechanism. The word 'pretend' marks his moral clarity — he sees their regression as a deliberate choice, not a genuine misunderstanding. He aligns himself firmly with Sheila against the older generation's denial."},
+      {phrase:"the girl's dead and we all helped to kill her",fullQuote:"And I say the girl's dead and we all helped to kill her — and that's what matters.",location:'Act 3',blank:'kill',analysis:"Eric mirrors the Inspector's central message directly. 'We all helped to kill her' distributes guilt across the whole family, refusing to allow any single scapegoat. The dash before 'and that's what matters' strips away all the procedural debates about whether Goole was a real inspector — Eric has grasped what actually counts."},
+      {phrase:"she didn't want me to go seeing her. Said I made her feel worse",fullQuote:"She told me. She didn't want me to go seeing her. Said I made her feel worse.",location:'Act 3',blank:'worse',analysis:"Reveals Eva's moral courage and independence. Even in desperate circumstances — pregnant, penniless — she refused to be dependent on someone who had harmed her. The detail humanises Eva and deepens Eric's self-condemnation: even the woman he wronged had more integrity than he did."},
+      {phrase:'I was in a state when a chap easily turns nasty — and I threatened to make a row',fullQuote:'I was in a state when a chap easily turns nasty — and I threatened to make a row.',location:'Act 3',blank:'nasty',analysis:"One of the play's most unflinching admissions. The casual phrase 'turns nasty' makes the coercive nature of Eric's behaviour explicit. He does not soften it with euphemism — 'threatened to make a row' acknowledges that force, not consent, was the basis of the encounter."},
+      {phrase:'(miserably) I got her into trouble',fullQuote:'(miserably) I got her into trouble.',location:'Act 3',blank:'trouble',analysis:"The understatement carries enormous weight. 'Got her into trouble' is a colloquial phrase that might seem to minimise what happened — but the stage direction 'miserably' confirms this is authentic remorse, not evasion. The gap between the small words and the vast reality they describe is itself an expression of shame."},
     ]
   },
   {
     id:'gerald', title:'Gerald Croft', role:'Fiancé · Upper-Class Outsider · Moral Pragmatist',
-    snippet:'Everything\'s all right now, Sheila. What about this ring?',
-    context:`Gerald Croft is engaged to Sheila Birling at the play's opening. He is described as 'an attractive chap about thirty, rather too manly to be a dandy but very well-bred.' He is the son of Lord and Lady Croft, placing him firmly in the aristocratic upper class — socially above even the Birlings. Gerald's class position is significant: he represents the established, confident upper class, in contrast to the Birlings' aspirational social climbing.\n\nGerald had an affair with Eva Smith — who was then calling herself Daisy Renton — while she was destitute. He set her up in a friend's apartment, and the relationship was, by Eva's account, the happiest period of her short life. He ended it when his social commitments resumed. Crucially, Gerald is the first to begin dismantling the Inspector's case in Act Three, and his pragmatic scepticism drives the regression of Arthur and Sybil back to comfortable denial.`,
+    snippet:"Everything's all right now, Sheila. What about this ring?",
+    context:"Gerald Croft is engaged to Sheila Birling at the play's opening. He is described as 'an attractive chap about thirty, rather too manly to be a dandy but very well-bred.' He is the son of Lord and Lady Croft, placing him firmly in the aristocratic upper class — socially above even the Birlings. Gerald's class position is significant: he represents the established, confident upper class, in contrast to the Birlings' aspirational social climbing.\n\nGerald had an affair with Eva Smith — who was then calling herself Daisy Renton — while she was destitute. He set her up in a friend's apartment, and the relationship was, by Eva's account, the happiest period of her short life. He ended it when his social commitments resumed. Crucially, Gerald is the first to begin dismantling the Inspector's case in Act Three, and his pragmatic scepticism drives the regression of Arthur and Sybil back to comfortable denial.",
     contextQuestions:[
-      {q:'What is Gerald\'s history with Eva Smith and why is it morally ambiguous?',a:'He set her up in an apartment and the relationship was — by Eva\'s account — the happiest period of her life. But he ended it entirely on his own terms when it became inconvenient, and made no attempt to find her afterwards.'},
-      {q:'What is "paternalism" and how does it apply to Gerald\'s relationship with Eva?',a:'Paternalism is controlling someone supposedly for their benefit but without genuine equality. Gerald rescued Eva from immediate danger but controlled the terms of the relationship and ended it unilaterally — care conditional on his convenience.'},
-      {q:'How does Gerald function as a "catalyst for regression"?',a:'He is the first to investigate whether Goole was a real police inspector. His pragmatic scepticism gives Arthur and Sybil the excuse to return to comfortable denial — without Gerald, they would have been forced to sit with their guilt.'},
-      {q:'How does Sheila\'s refusal of the ring mark Gerald\'s failure to change?',a:'Gerald offers the ring assuming the revelation that Goole was not a real inspector means things can return to normal. Sheila\'s refusal signals that his moral regression is permanent — he has not truly changed.'},
-      {q:'What does Gerald\'s response "We\'ve been had" reveal about his values?',a:'It reveals that his focus is on procedural technicality rather than moral substance — he is more concerned with whether the Inspector was real than with the actions the evening revealed. He entirely misses the point.'},
-      {q:'How does Gerald\'s class position allow him to deflect scrutiny more effectively than the Birlings?',a:'His aristocratic confidence, connections, and investigative instinct in Act 3 all reflect the ease and entitlement of secure class privilege. He is more composed under pressure than the socially anxious Birlings.'},
+      {q:"What is Gerald's history with Eva Smith and why is it morally ambiguous?",a:"He set her up in an apartment and the relationship was — by Eva's account — the happiest period of her life. But he ended it entirely on his own terms when it became inconvenient, and made no attempt to find her afterwards."},
+      {q:"What is 'paternalism' and how does it apply to Gerald's relationship with Eva?",a:"Paternalism is controlling someone supposedly for their benefit but without genuine equality. Gerald rescued Eva from immediate danger but controlled the terms of the relationship and ended it unilaterally — care conditional on his convenience."},
+      {q:'How does Gerald function as a "catalyst for regression"?',a:"He is the first to investigate whether Goole was a real police inspector. His pragmatic scepticism gives Arthur and Sybil the excuse to return to comfortable denial — without Gerald, they would have been forced to sit with their guilt."},
+      {q:"How does Sheila's refusal of the ring mark Gerald's failure to change?",a:"Gerald offers the ring assuming the revelation that Goole was not a real inspector means things can return to normal. Sheila's refusal signals that his moral regression is permanent — he has not truly changed."},
+      {q:'What does Gerald\'s response "We\'ve been had" reveal about his values?',a:"It reveals that his focus is on procedural technicality rather than moral substance — he is more concerned with whether the Inspector was real than with the actions the evening revealed. He entirely misses the point."},
+      {q:"How does Gerald's class position allow him to deflect scrutiny more effectively than the Birlings?",a:'His aristocratic confidence, connections, and investigative instinct in Act 3 all reflect the ease and entitlement of secure class privilege. He is more composed under pressure than the socially anxious Birlings.'},
     ],
     quotes:[
-      {phrase:'inevitable. She was young and pretty and warm-hearted',fullQuote:'I suppose it was inevitable. She was young and pretty and warm-hearted — and intensely grateful.',location:'Act 2',blank:'inevitable',analysis:`The word 'inevitable' is Gerald's most revealing choice. The passive construction removes his personal agency entirely — the affair just happened, as a natural law, rather than as a result of his choices and her desperation. The catalogue of Eva's qualities ('young', 'pretty', 'warm-hearted') reads as appreciation but functions as justification for exploitation.`},
-      {phrase:'Everything\'s all right now, Sheila. What about this ring?',fullQuote:'Everything\'s all right now, Sheila. What about this ring?',location:'Act 3',blank:'ring',analysis:`Gerald's attempt to restore the pre-Inspector status quo as if the evening's revelations can be simply undone. 'Everything\'s all right now' is both false (nothing is all right) and revealing (Gerald has prioritised appearances over substance). Sheila's refusal of the ring is the play's most explicit statement that some things cannot be undone.`},
-      {phrase:'We\'ve been had',fullQuote:'We\'ve been had. That man was not a police inspector.',location:'Act 3',blank:'had',analysis:`Gerald reduces the entire evening's moral reckoning to a question of procedural legitimacy. 'We've been had' frames the family as victims of a trick rather than people who have been made to confront genuine guilt. His focus is entirely on whether Goole was a real inspector — entirely missing the point that the actions themselves were real.`},
-      {phrase:'I did her no good in the end',fullQuote:'I did her no good in the end.',location:'Act 2',blank:'good',analysis:`A brief, honest moment of self-awareness — the clearest admission of genuine culpability that Gerald makes. But it is quickly overshadowed by his Act 3 desire to simply move on. The phrase 'in the end' implies that the good came first and the harm was incidental — still a form of deflection.`},
-      {phrase:'I wasn\'t in love with her or anything — but I liked her',fullQuote:'I wasn\'t in love with her or anything — but I liked her — she was in a way — well, sort of grateful.',location:'Act 2',blank:'grateful',analysis:`The halting syntax — the repeated dashes, the hedging qualifiers 'in a way', 'well, sort of' — reveals Gerald's discomfort with his own memory. He cannot quite articulate the relationship honestly because to do so would force him to acknowledge its transactional nature. 'Grateful' is the word he lands on — and it is damning.`},
-      {phrase:'very gallant about it',fullQuote:'She was very gallant about it.',location:'Act 2',blank:'gallant',analysis:`Gerald admires Eva's dignity from a comfortable distance. The word 'gallant' — a term usually applied to men in battle — is paternalistic: he praises her for bearing her abandonment well rather than acknowledging his responsibility for causing it. His appreciation is an act of condescension dressed as respect.`},
+      {phrase:'inevitable. She was young and pretty and warm-hearted',fullQuote:'I suppose it was inevitable. She was young and pretty and warm-hearted — and intensely grateful.',location:'Act 2',blank:'inevitable',analysis:"The word 'inevitable' is Gerald's most revealing choice. The passive construction removes his personal agency entirely — the affair just happened, as a natural law, rather than as a result of his choices and her desperation. The catalogue of Eva's qualities ('young', 'pretty', 'warm-hearted') reads as appreciation but functions as justification for exploitation."},
+      {phrase:"Everything's all right now, Sheila. What about this ring?",fullQuote:"Everything's all right now, Sheila. What about this ring?",location:'Act 3',blank:'ring',analysis:"Gerald's attempt to restore the pre-Inspector status quo as if the evening's revelations can be simply undone. 'Everything's all right now' is both false (nothing is all right) and revealing (Gerald has prioritised appearances over substance). Sheila's refusal of the ring is the play's most explicit statement that some things cannot be undone."},
+      {phrase:"We've been had",fullQuote:"We've been had. That man was not a police inspector.",location:'Act 3',blank:'had',analysis:"Gerald reduces the entire evening's moral reckoning to a question of procedural legitimacy. 'We've been had' frames the family as victims of a trick rather than people who have been made to confront genuine guilt. His focus is entirely on whether Goole was a real inspector — entirely missing the point that the actions themselves were real."},
+      {phrase:'I did her no good in the end',fullQuote:'I did her no good in the end.',location:'Act 2',blank:'good',analysis:"A brief, honest moment of self-awareness — the clearest admission of genuine culpability that Gerald makes. But it is quickly overshadowed by his Act 3 desire to simply move on. The phrase 'in the end' implies that the good came first and the harm was incidental — still a form of deflection."},
+      {phrase:"I wasn't in love with her or anything — but I liked her",fullQuote:"I wasn't in love with her or anything — but I liked her — she was in a way — well, sort of grateful.",location:'Act 2',blank:'grateful',analysis:"The halting syntax — the repeated dashes, the hedging qualifiers 'in a way', 'well, sort of' — reveals Gerald's discomfort with his own memory. He cannot quite articulate the relationship honestly because to do so would force him to acknowledge its transactional nature. 'Grateful' is the word he lands on — and it is damning."},
+      {phrase:'very gallant about it',fullQuote:'She was very gallant about it.',location:'Act 2',blank:'gallant',analysis:"Gerald admires Eva's dignity from a comfortable distance. The word 'gallant' — a term usually applied to men in battle — is paternalistic: he praises her for bearing her abandonment well rather than acknowledging his responsibility for causing it. His appreciation is an act of condescension dressed as respect."},
     ]
   },
   {
     id:'eva', title:'Eva Smith / Daisy Renton', role:'Victim · Symbol of the Working Class · Absent Presence',
-    snippet:'She felt she couldn\'t take any more — she was in great agony of mind.',
-    context:`Eva Smith never appears on stage — she is an 'absent presence' whose life and death frame the entire play. Known variously as Eva Smith, Daisy Renton, and other names, she is a young working-class woman exploited by every member of the Birling household in turn. Her name is deliberately symbolic: 'Eva' echoes Eve, the archetypal woman; 'Smith' is the most common English surname, suggesting she represents every working-class woman — an 'Everywoman.'\n\nSet in 1912, Eva exists in a world with almost no protection for working women: no welfare state, no minimum wage, no trade union power, no abortion rights. Her death by suicide is not presented as bad luck but as the inevitable product of a system designed to exploit and discard people like her. Eva's story is reconstructed entirely through the testimonies of those who wronged her, forcing the audience to notice how the powerful narrate the lives of the powerless.`,
+    snippet:"She felt she couldn't take any more — she was in great agony of mind.",
+    context:"Eva Smith never appears on stage — she is an 'absent presence' whose life and death frame the entire play. Known variously as Eva Smith, Daisy Renton, and other names, she is a young working-class woman exploited by every member of the Birling household in turn. Her name is deliberately symbolic: 'Eva' echoes Eve, the archetypal woman; 'Smith' is the most common English surname, suggesting she represents every working-class woman — an 'Everywoman.'\n\nSet in 1912, Eva exists in a world with almost no protection for working women: no welfare state, no minimum wage, no trade union power, no abortion rights. Her death by suicide is not presented as bad luck but as the inevitable product of a system designed to exploit and discard people like her. Eva's story is reconstructed entirely through the testimonies of those who wronged her, forcing the audience to notice how the powerful narrate the lives of the powerless.",
     contextQuestions:[
-      {q:'Why is Eva Smith described as an "absent presence"?',a:'She never appears on stage, yet her life and death frame the entire play. Her physical absence forces the audience to construct her through the testimonies of others, highlighting how the voices of the powerless are always mediated through the powerful.'},
-      {q:'What is the symbolic significance of Eva\'s name?',a:'"Eva" echoes Eve, the archetypal woman; "Smith" is the most common English surname. Together they signal she represents not one woman but the entire working class — confirmed by the Inspector\'s line about "millions of Eva Smiths."'},
-      {q:'What does "cumulative causation" mean in relation to Eva?',a:'No single character killed Eva — her destruction is the result of a cumulative chain of exploitation by multiple people across multiple encounters. Priestley uses this to argue that social injustice is systemic, not attributable to any single villain.'},
-      {q:'How does Eva demonstrate "moral exemplar" status despite being the victim?',a:'She organises for workers\' rights, refuses Eric\'s stolen money on principle, and is described as "pretty and lively" — full of humanity. Priestley inverts the class hierarchy of virtue: Eva is morally superior to her exploiters.'},
-      {q:'Why is Eva\'s story told entirely through others\' testimonies?',a:'This formal choice reflects her real social position: the working class in 1912 had no political voice. The audience can only see Eva through the distorting lens of class privilege, and must read against those narratives.'},
-      {q:'What does Eva\'s world in 1912 lack that makes her death "inevitable"?',a:'No welfare state, no minimum wage, no trade union power, no abortion rights, and limited legal recourse against assault. Her death is the inevitable product of a system designed to exploit and discard people like her.'},
+      {q:'Why is Eva Smith described as an "absent presence"?',a:"She never appears on stage, yet her life and death frame the entire play. Her physical absence forces the audience to construct her through the testimonies of others, highlighting how the voices of the powerless are always mediated through the powerful."},
+      {q:"What is the symbolic significance of Eva's name?",a:'"Eva" echoes Eve, the archetypal woman; "Smith" is the most common English surname. Together they signal she represents not one woman but the entire working class — confirmed by the Inspector\'s line about "millions of Eva Smiths."'},
+      {q:'What does "cumulative causation" mean in relation to Eva?',a:"No single character killed Eva — her destruction is the result of a cumulative chain of exploitation by multiple people across multiple encounters. Priestley uses this to argue that social injustice is systemic, not attributable to any single villain."},
+      {q:'How does Eva demonstrate "moral exemplar" status despite being the victim?',a:"She organises for workers' rights, refuses Eric's stolen money on principle, and is described as 'pretty and lively' — full of humanity. Priestley inverts the class hierarchy of virtue: Eva is morally superior to her exploiters."},
+      {q:"Why is Eva's story told entirely through others' testimonies?",a:"This formal choice reflects her real social position: the working class in 1912 had no political voice. The audience can only see Eva through the distorting lens of class privilege, and must read against those narratives."},
+      {q:"What does Eva's world in 1912 lack that makes her death 'inevitable'?",a:'No welfare state, no minimum wage, no trade union power, no abortion rights, and limited legal recourse against assault. Her death is the inevitable product of a system designed to exploit and discard people like her.'},
     ],
     quotes:[
-      {phrase:'She\'d had a lot to say — far too much — she had to go',fullQuote:'She\'d had a lot to say — far too much — she had to go.',location:'Act 1 (Birling)',blank:'say',analysis:`Birling's description of Eva's activism as the reason she was dismissed. 'Had a lot to say' means she advocated for workers' rights — her refusal to be silent was the 'crime' for which she was punished. The dashes create a callous rhythm: too much speech, therefore erasure.`},
-      {phrase:'a very pretty girl too — with big dark eyes',fullQuote:'She was a very pretty girl too — with big dark eyes.',location:'Act 1 (Sheila)',blank:'pretty',analysis:`Sheila's description immediately reveals the jealousy that motivated her own act against Eva. Eva's beauty is simultaneously what made her memorable and what made her a target. The detail of 'big dark eyes' gives Eva an individuality and humanity that the play's absent-presence structure otherwise denies her.`},
-      {phrase:'happier than she\'d ever been before',fullQuote:'She told me she\'d been happier than she\'d ever been before.',location:'Act 2 (Gerald)',blank:'happier',analysis:`Eva's capacity for genuine happiness makes her tragedy more acute. She was not defined by her suffering — she could experience joy, love, and contentment. This detail refuses to allow Eva to be simply 'a victim' and insists on her full humanity, making the waste of her life more devastating.`},
-      {phrase:'in great agony of mind',fullQuote:'She felt she couldn\'t take any more — she was in great agony of mind.',location:'Act 3 (Inspector)',blank:'agony',analysis:`The Inspector restores Eva's interiority and subjectivity. 'Great agony of mind' gives Eva an inner life — she is not merely a victim of events but a suffering, feeling person whose psychological pain is as real as any physical wound. The phrase forces the audience to inhabit her perspective.`},
-      {phrase:'even if she was desperately hungry she just couldn\'t take stolen money',fullQuote:'She felt that even if she was desperately hungry she just couldn\'t take stolen money.',location:'Act 3 (Inspector, from diary)',blank:'hungry',analysis:`Eva's moral code is more rigorous than that of the wealthy family whose son stole the money. 'Desperately hungry' makes the stakes visceral — this is not abstract principle but a choice made under genuine physical need. She is morally superior to her exploiters even at her most desperate.`},
-      {phrase:'Two hours ago a young woman died in the Infirmary',fullQuote:'Two hours ago a young woman died in the Infirmary. She\'d been taken there this afternoon, after swallowing a lot of strong disinfectant.',location:'Act 1 (Inspector)',blank:'died',analysis:`The Inspector's clinical opening statement establishes the stakes immediately. The specificity — 'two hours ago', 'strong disinfectant' — refuses to allow the audience to remain comfortable or abstract. There is no softening, no euphemism: a young woman has died in agony. Everything that follows is an explanation of how the people in this room are responsible.`},
+      {phrase:"She'd had a lot to say — far too much — she had to go",fullQuote:"She'd had a lot to say — far too much — she had to go.",location:'Act 1 (Birling)',blank:'say',analysis:"Birling's description of Eva's activism as the reason she was dismissed. 'Had a lot to say' means she advocated for workers' rights — her refusal to be silent was the 'crime' for which she was punished. The dashes create a callous rhythm: too much speech, therefore erasure."},
+      {phrase:'a very pretty girl too — with big dark eyes',fullQuote:'She was a very pretty girl too — with big dark eyes.',location:'Act 1 (Sheila)',blank:'pretty',analysis:"Sheila's description immediately reveals the jealousy that motivated her own act against Eva. Eva's beauty is simultaneously what made her memorable and what made her a target. The detail of 'big dark eyes' gives Eva an individuality and humanity that the play's absent-presence structure otherwise denies her."},
+      {phrase:"happier than she'd ever been before",fullQuote:"She told me she'd been happier than she'd ever been before.",location:'Act 2 (Gerald)',blank:'happier',analysis:"Eva's capacity for genuine happiness makes her tragedy more acute. She was not defined by her suffering — she could experience joy, love, and contentment. This detail refuses to allow Eva to be simply 'a victim' and insists on her full humanity, making the waste of her life more devastating."},
+      {phrase:'in great agony of mind',fullQuote:"She felt she couldn't take any more — she was in great agony of mind.",location:'Act 3 (Inspector)',blank:'agony',analysis:"The Inspector restores Eva's interiority and subjectivity. 'Great agony of mind' gives Eva an inner life — she is not merely a victim of events but a suffering, feeling person whose psychological pain is as real as any physical wound. The phrase forces the audience to inhabit her perspective."},
+      {phrase:"even if she was desperately hungry she just couldn't take stolen money",fullQuote:"She felt that even if she was desperately hungry she just couldn't take stolen money.",location:'Act 3 (Inspector, from diary)',blank:'hungry',analysis:"Eva's moral code is more rigorous than that of the wealthy family whose son stole the money. 'Desperately hungry' makes the stakes visceral — this is not abstract principle but a choice made under genuine physical need. She is morally superior to her exploiters even at her most desperate."},
+      {phrase:'Two hours ago a young woman died in the Infirmary',fullQuote:"Two hours ago a young woman died in the Infirmary. She'd been taken there this afternoon, after swallowing a lot of strong disinfectant.",location:'Act 1 (Inspector)',blank:'died',analysis:"The Inspector's clinical opening statement establishes the stakes immediately. The specificity — 'two hours ago', 'strong disinfectant' — refuses to allow the audience to remain comfortable or abstract. There is no softening, no euphemism: a young woman has died in agony. Everything that follows is an explanation of how the people in this room are responsible."},
     ]
   },
   {
     id:'inspector', title:'Inspector Goole', role:'Moral Inquisitor · Socialist Voice · Supernatural Figure',
     snippet:'We are members of one body. We are responsible for each other.',
-    context:`Inspector Goole arrives at the Birling house unannounced and proceeds to systematically dismantle the family's comfortable self-image over the course of one evening. He creates 'an impression of massiveness, solidity and purposefulness', suggesting he is more than a simple police officer. His name — 'Goole' — is a homophone of 'ghoul', immediately signalling his supernatural or symbolic nature. Priestley never resolves whether he is a real inspector, a ghost, a collective conscience, or a divine agent — this deliberate ambiguity is central to the play's meaning.\n\nWritten in 1945, the Inspector voices Priestley's own socialist beliefs directly and forcefully. He is the play's moral compass — its raisonneur. Unlike a real police inspector, Goole is not interested in prosecution — he is interested in confession and transformation. He appears to already know what happened to Eva Smith; his role is to make the Birlings confront what they know about themselves.`,
+    context:"Inspector Goole arrives at the Birling house unannounced and proceeds to systematically dismantle the family's comfortable self-image over the course of one evening. He creates 'an impression of massiveness, solidity and purposefulness', suggesting he is more than a simple police officer. His name — 'Goole' — is a homophone of 'ghoul', immediately signalling his supernatural or symbolic nature. Priestley never resolves whether he is a real inspector, a ghost, a collective conscience, or a divine agent — this deliberate ambiguity is central to the play's meaning.\n\nWritten in 1945, the Inspector voices Priestley's own socialist beliefs directly and forcefully. He is the play's moral compass — its raisonneur. Unlike a real police inspector, Goole is not interested in prosecution — he is interested in confession and transformation. He appears to already know what happened to Eva Smith; his role is to make the Birlings confront what they know about themselves.",
     contextQuestions:[
       {q:'What does the name "Goole" suggest about the Inspector\'s nature?',a:'It is a homophone of "ghoul" — immediately signalling his supernatural or symbolic nature. Priestley deliberately never resolves whether he is a real inspector, a ghost, a collective conscience, or a divine agent.'},
-      {q:'What is a "raisonneur" and how does the Inspector function as one?',a:'A raisonneur is a character who articulates the author\'s own moral and political views directly. The Inspector\'s speeches are Priestley\'s addresses to the nation in dramatic form.'},
-      {q:'How does the Inspector\'s method differ from that of a real police inspector?',a:'He is not interested in prosecution but in confession and transformation. He appears to already know what happened — his role is to force the Birlings to confront what they know about themselves.'},
-      {q:'What is the significance of the Inspector\'s final speech for a 1945 audience?',a:'"They will be taught it in fire and blood and anguish" — for a 1945 audience who had lived through WWI and WWII, this was the lived experience of what happens when the Birlings\' worldview prevails.'},
-      {q:'How does the play\'s cyclical structure reinforce the Inspector\'s warning?',a:'The Inspector\'s departure and the final phone call (announcing a real inspector is coming) suggest the events will repeat — moral lessons must be actively learned by each generation or the consequences return.'},
-      {q:'What does the Inspector\'s apparent omniscience suggest about him?',a:'His foreknowledge of events and absolute control of the interrogation sequence give him godlike authority. He is not discovering information — he is revealing what was already known to those who already knew it.'},
+      {q:'What is a "raisonneur" and how does the Inspector function as one?',a:"A raisonneur is a character who articulates the author's own moral and political views directly. The Inspector's speeches are Priestley's addresses to the nation in dramatic form."},
+      {q:"How does the Inspector's method differ from that of a real police inspector?",a:'He is not interested in prosecution but in confession and transformation. He appears to already know what happened — his role is to force the Birlings to confront what they know about themselves.'},
+      {q:"What is the significance of the Inspector's final speech for a 1945 audience?",a:'"They will be taught it in fire and blood and anguish" — for a 1945 audience who had lived through WWI and WWII, this was the lived experience of what happens when the Birlings\' worldview prevails.'},
+      {q:"How does the play's cyclical structure reinforce the Inspector's warning?",a:"The Inspector's departure and the final phone call (announcing a real inspector is coming) suggest the events will repeat — moral lessons must be actively learned by each generation or the consequences return."},
+      {q:"What does the Inspector's apparent omniscience suggest about him?",a:'His foreknowledge of events and absolute control of the interrogation sequence give him godlike authority. He is not discovering information — he is revealing what was already known to those who already knew it.'},
     ],
     quotes:[
-      {phrase:'members of one body. We are responsible for each other',fullQuote:'We don\'t live alone. We are members of one body. We are responsible for each other.',location:'Act 3',blank:'responsible',analysis:`The Inspector's core moral thesis — a direct expression of socialist collectivism and the philosophical foundation of the welfare state. The metaphor of 'one body' transforms society from a collection of competing individuals into a single organism: harm to one part is harm to the whole. This directly inverts Birling's 'a man has to look after himself.'`},
-      {phrase:'Public men have responsibilities as well as privileges',fullQuote:'Public men, Mr Birling, have responsibilities as well as privileges.',location:'Act 1',blank:'responsibilities',analysis:`The Inspector immediately challenges Birling's belief that wealth confers freedom from social obligation. The pairing of 'responsibilities' with 'privileges' insists that power and duty are inseparable — you cannot have one without the other. This sets up the play's central ideological conflict from the very first exchange.`},
-      {phrase:'helped to kill her',fullQuote:'(Each of you) helped to kill her.',location:'Act 3',blank:'kill',analysis:`The phrase distributes guilt equally across all characters — Birling, Sybil, Sheila, Gerald, and Eric all receive the same verdict. 'Helped' is precise: not one of them killed Eva alone, but each contributed. The Inspector refuses to allow any single scapegoat and insists on collective moral causation.`},
-      {phrase:'millions and millions of Eva Smiths and John Smiths',fullQuote:'One Eva Smith has gone — but there are millions and millions of Eva Smiths and John Smiths still left with us.',location:'Act 3',blank:'millions',analysis:`The Inspector expands the play's scope from the particular to the universal. The repetition of 'millions' is overwhelming — Eva's story is not an isolated tragedy but a systemic pattern. 'John Smiths' makes explicit that this is a class issue, not a gender one. The speech transforms the play from a domestic drama into a political manifesto.`},
-      {phrase:'taught it in fire and blood and anguish',fullQuote:'If men will not learn that lesson, then they will be taught it in fire and blood and anguish.',location:'Act 3',blank:'fire',analysis:`Prophetic warning using the language of the Old Testament. For a 1945 audience, 'fire and blood and anguish' was not metaphor but lived memory — two world wars in thirty years. The triplet of nouns builds to 'anguish', the most personal and human of the three, suggesting that the ultimate cost of Birling's worldview is not political but emotional devastation.`},
-      {phrase:'Never forget it',fullQuote:'Each of you helped to kill her. Remember that. Never forget it.',location:'Act 3',blank:'forget',analysis:`The imperative mood transforms the Inspector from investigator to moral judge. The shift from 'remember' to 'never forget it' — from positive to negative command — doubles the injunction, making it impossible to dismiss. The final 'Never forget it' is the Inspector's last act of moral authority before he leaves.`},
+      {phrase:'members of one body. We are responsible for each other',fullQuote:"We don't live alone. We are members of one body. We are responsible for each other.",location:'Act 3',blank:'responsible',analysis:"The Inspector's core moral thesis — a direct expression of socialist collectivism and the philosophical foundation of the welfare state. The metaphor of 'one body' transforms society from a collection of competing individuals into a single organism: harm to one part is harm to the whole. This directly inverts Birling's 'a man has to look after himself.'"},
+      {phrase:'Public men have responsibilities as well as privileges',fullQuote:'Public men, Mr Birling, have responsibilities as well as privileges.',location:'Act 1',blank:'responsibilities',analysis:"The Inspector immediately challenges Birling's belief that wealth confers freedom from social obligation. The pairing of 'responsibilities' with 'privileges' insists that power and duty are inseparable — you cannot have one without the other. This sets up the play's central ideological conflict from the very first exchange."},
+      {phrase:'helped to kill her',fullQuote:'(Each of you) helped to kill her.',location:'Act 3',blank:'kill',analysis:"The phrase distributes guilt equally across all characters — Birling, Sybil, Sheila, Gerald, and Eric all receive the same verdict. 'Helped' is precise: not one of them killed Eva alone, but each contributed. The Inspector refuses to allow any single scapegoat and insists on collective moral causation."},
+      {phrase:'millions and millions of Eva Smiths and John Smiths',fullQuote:'One Eva Smith has gone — but there are millions and millions of Eva Smiths and John Smiths still left with us.',location:'Act 3',blank:'millions',analysis:"The Inspector expands the play's scope from the particular to the universal. The repetition of 'millions' is overwhelming — Eva's story is not an isolated tragedy but a systemic pattern. 'John Smiths' makes explicit that this is a class issue, not a gender one. The speech transforms the play from a domestic drama into a political manifesto."},
+      {phrase:'taught it in fire and blood and anguish',fullQuote:'If men will not learn that lesson, then they will be taught it in fire and blood and anguish.',location:'Act 3',blank:'fire',analysis:"Prophetic warning using the language of the Old Testament. For a 1945 audience, 'fire and blood and anguish' was not metaphor but lived memory — two world wars in thirty years. The triplet of nouns builds to 'anguish', the most personal and human of the three, suggesting that the ultimate cost of Birling's worldview is not political but emotional devastation."},
+      {phrase:'Never forget it',fullQuote:'Each of you helped to kill her. Remember that. Never forget it.',location:'Act 3',blank:'forget',analysis:"The imperative mood transforms the Inspector from investigator to moral judge. The shift from 'remember' to 'never forget it' — from positive to negative command — doubles the injunction, making it impossible to dismiss. The final 'Never forget it' is the Inspector's last act of moral authority before he leaves."},
     ]
   },
   {
     id:'context', title:'Context & Themes', role:'Historical Context · Allegory · Key Themes · Dramatic Devices',
     snippet:'Writing at the end of World War Two, Priestley was urging his audience to choose the socialist path — collective responsibility, the welfare state — over a nostalgic return to the Edwardian world of the Birlings.',
-    context:`An Inspector Calls is set in 1912 — two years before the outbreak of World War One — but was written and first performed in 1945, as World War Two ended and Britain prepared to elect its first majority Labour government. This dual temporal setting is central to the play's meaning and power.\n\nIn 1912, Britain was rigidly stratified by class. The Edwardian era was characterised by vast inequality: a tiny wealthy class enjoyed extraordinary privilege while the working class endured poverty, long hours, poor housing, and almost no legal protections. Women had no right to vote, and working-class women like Eva Smith had virtually no recourse against exploitation.\n\nPriestley's 1945 audience had lived through the Great Depression, two catastrophic World Wars, the Blitz, and the enormous sacrifices of ordinary working people. They were on the cusp of voting in the welfare state. Priestley used the play to argue that the Birlings' 1912 attitudes were not historical curiosities but live dangers that could, if not actively rejected, produce catastrophe again.\n\nJ.B. Priestley (1894–1984) was born in Bradford to a working-class family. He served in World War One, witnessing stark class inequalities first-hand. During World War Two he became one of Britain's most influential public intellectuals through his BBC radio 'Postscripts' broadcasts, arguing passionately for a fairer, post-war Britain built on collective responsibility and equality. He was a significant cultural influence in the climate that led to the Labour Party's 1945 landslide and the creation of the NHS and welfare state.`,
+    context:"An Inspector Calls is set in 1912 — two years before the outbreak of World War One — but was written and first performed in 1945, as World War Two ended and Britain prepared to elect its first majority Labour government. This dual temporal setting is central to the play's meaning and power.\n\nIn 1912, Britain was rigidly stratified by class. The Edwardian era was characterised by vast inequality: a tiny wealthy class enjoyed extraordinary privilege while the working class endured poverty, long hours, poor housing, and almost no legal protections. Women had no right to vote, and working-class women like Eva Smith had virtually no recourse against exploitation.\n\nPriestley's 1945 audience had lived through the Great Depression, two catastrophic World Wars, the Blitz, and the enormous sacrifices of ordinary working people. They were on the cusp of voting in the welfare state. Priestley used the play to argue that the Birlings' 1912 attitudes were not historical curiosities but live dangers that could, if not actively rejected, produce catastrophe again.\n\nJ.B. Priestley (1894–1984) was born in Bradford to a working-class family. He served in World War One, witnessing stark class inequalities first-hand. During World War Two he became one of Britain's most influential public intellectuals through his BBC radio 'Postscripts' broadcasts, arguing passionately for a fairer, post-war Britain built on collective responsibility and equality. He was a significant cultural influence in the climate that led to the Labour Party's 1945 landslide and the creation of the NHS and welfare state.",
     quotes: [],
     contextQuestions:[
-      {q:'Why is the dual time setting of 1912 and 1945 central to the play\'s meaning?',a:'The play is set in 1912 but written/performed in 1945. The gap means the audience already knows Birling\'s predictions about the Titanic and no war are catastrophically wrong — the dramatic irony immediately frames his worldview as dangerous, not merely foolish.'},
+      {q:"Why is the dual time setting of 1912 and 1945 central to the play's meaning?",a:"The play is set in 1912 but written/performed in 1945. The gap means the audience already knows Birling's predictions about the Titanic and no war are catastrophically wrong — the dramatic irony immediately frames his worldview as dangerous, not merely foolish."},
       {q:'What was Britain like in 1912, and why does this matter for Eva Smith?',a:'Britain was rigidly class-stratified. The working class endured poverty, long hours, poor housing, and almost no legal protections. Women had no right to vote. Working-class women like Eva had virtually no recourse against exploitation by social superiors.'},
       {q:'Who was J.B. Priestley and what were his core political beliefs?',a:'Born 1894 in Bradford to a working-class family; served in WWI. A passionate socialist — he believed in equitable wealth distribution, collective responsibility, anti-capitalism, internationalism, and pacifism. His wartime BBC broadcasts shaped the political climate that produced the 1945 Labour landslide and the welfare state.'},
       {q:'How does the play function as a political allegory?',a:'The Birling family home represents Britain itself — prosperous and self-satisfied, celebrating while ignoring those it exploits. Each character allegorically represents a social class or force: Birling = capitalist ruling class; Sybil = aristocratic establishment; Gerald = confident upper class; Sheila & Eric = the transformable younger generation; Eva = the working class; the Inspector = socialist conscience.'},
       {q:'What are the six key themes of An Inspector Calls?',a:'1. Collective responsibility — we are all responsible for one another. 2. Class and social inequality — class privilege is lethal, not merely unfair. 3. Generational conflict — only the young can still change. 4. Gender and power — Eva, Sheila and Daisy exist in a patriarchal system. 5. Time and cyclicality — the ending warns history repeats. 6. Guilt and remorse — true remorse transforms; false remorse returns to illusion.'},
-      {q:'What are the key dramatic devices Priestley uses and what does each do?',a:'Dramatic irony (Birling\'s false predictions expose his dangerous worldview); The Three Unities (one room, one evening, one action — creates claustrophobia and moral inevitability); Retrospective structure (Eva\'s story told backwards, building cumulative guilt); Cyclical ending (final phone call suggests the lesson must be learned or repeat); Symbolism (lighting = moral exposure; disinfectant = Eva treated as social contaminant).'},
-      {q:'What is the significance of the Three Unities in the play?',a:'The play observes the classical unities of time, place, and action — everything occurs in one room, one evening, one continuous narrative. This creates an atmosphere of inescapable claustrophobia and moral inevitability: the Birlings cannot escape the Inspector or their own guilt.'},
-      {q:'What is the retrospective structure and why is it important?',a:'Eva\'s life story is told backwards and fragmentarily through confession, implicating each character in turn. This builds cumulative, collective guilt that cannot be assigned to any single person — which is Priestley\'s central argument about social injustice being systemic.'},
+      {q:'What are the key dramatic devices Priestley uses and what does each do?',a:"Dramatic irony (Birling's false predictions expose his dangerous worldview); The Three Unities (one room, one evening, one action — creates claustrophobia and moral inevitability); Retrospective structure (Eva's story told backwards, building cumulative guilt); Cyclical ending (final phone call suggests the lesson must be learned or repeat); Symbolism (lighting = moral exposure; disinfectant = Eva treated as social contaminant)."},
+      {q:'What is the significance of the Three Unities in the play?',a:"The play observes the classical unities of time, place, and action — everything occurs in one room, one evening, one continuous narrative. This creates an atmosphere of inescapable claustrophobia and moral inevitability: the Birlings cannot escape the Inspector or their own guilt."},
+      {q:'What is the retrospective structure and why is it important?',a:"Eva's life story is told backwards and fragmentarily through confession, implicating each character in turn. This builds cumulative, collective guilt that cannot be assigned to any single person — which is Priestley's central argument about social injustice being systemic."},
       {q:'What is the symbolic meaning of the Inspector demanding "a good deal of light"?',a:'Before the Inspector arrives, the lighting is "pink and intimate" — comfortable and flattering. The Inspector demands bright light, symbolising moral exposure. The Birlings\' comfortable self-image cannot survive scrutiny; the light forces them to see themselves clearly.'},
-      {q:'What is Priestley\'s central message to his 1945 audience?',a:'To choose the socialist path — collective responsibility, the welfare state, redistribution of wealth — over a nostalgic return to Edwardian values. The Birlings\' individualism and class arrogance created the conditions for two world wars. The Inspector\'s warning about "fire and blood and anguish" was not metaphor for a 1945 audience — it was recent history.'},
+      {q:"What is Priestley's central message to his 1945 audience?",a:'To choose the socialist path — collective responsibility, the welfare state, redistribution of wealth — over a nostalgic return to Edwardian values. The Birlings\' individualism and class arrogance created the conditions for two world wars. The Inspector\'s warning about "fire and blood and anguish" was not metaphor for a 1945 audience — it was recent history.'},
+    ]
+  },
+  {
+    id:'plot', title:'Plot Guide', role:"Act-by-Act · Eva's Timeline · Dramatic Structure",
+    snippet:'By the end, the question is not what happened to Eva — but whether the Birlings will allow it to change them.',
+    context:"An Inspector Calls is a three-act play set entirely in the dining room of the Birling household in Brumley on a single evening in April 1912. Arthur Birling is hosting a celebratory dinner for the engagement of his daughter Sheila to Gerald Croft. The family's comfortable evening is shattered by Inspector Goole, who announces that Eva Smith has died by suicide — and that each member of the household played a part in destroying her.\n\nEVA SMITH'S TIMELINE: September 1910 — Arthur Birling sacks Eva for leading a wage strike. Early 1911 — Sheila has Eva dismissed from Milwards out of jealous spite. Late 1911 — Gerald takes Eva (now Daisy Renton) as a kept mistress; she describes this as the happiest period of her life. Autumn 1911 — Gerald ends the relationship when his social obligations resume. November 1911 — Eric meets Eva at the Palace bar, forces his way into her home; a relationship begins and she becomes pregnant. January 1912 — Eric steals £50 from Arthur's firm to give Eva; she refuses it when she discovers it is stolen. March 1912 — Sybil uses her influence to have Eva's appeal to the Brumley Women's Charity Organisation refused. April 1912 — Eva swallows disinfectant and dies. Two hours later, Inspector Goole arrives.\n\nACT ONE: The Birlings celebrate the engagement. Arthur dismisses collective responsibility and makes his famous (ironically wrong) predictions. The Inspector arrives and interrogates Arthur about sacking Eva, then Sheila about having her dismissed from Milwards. Sheila immediately accepts guilt. Gerald's visible reaction to the name 'Daisy Renton' ends the act.\n\nACT TWO: Gerald confesses to the affair with Daisy Renton. Sheila returns the ring. Sybil is questioned and coldly admits using her influence to deny Eva's appeal. In the act's most devastating moment, Sybil passionately insists the father of Eva's child must bear full responsibility — unknowingly condemning her own son. Eric enters, guilt written on his face.\n\nACT THREE: Eric confesses everything — the coercion, the pregnancy, the stolen money, Eva's refusal of it. The Inspector delivers his final speech on collective responsibility and departs. Gerald returns with the news that there is no Inspector Goole on the police force. The family splits: Arthur and Sybil retreat to denial; Sheila and Eric refuse. The telephone rings — a girl has died, a real inspector is coming. The cycle begins again.",
+    quotes: [],
+    contextQuestions:[
+      {q:"What is Eva Smith's timeline of exploitation, and who is responsible at each stage?",a:'Sept 1910: Birling sacks her for striking. Early 1911: Sheila has her dismissed from Milwards. Late 1911: Gerald takes her as a mistress (Daisy Renton). Autumn 1911: Gerald abandons her. Nov 1911: Eric coerces her and she becomes pregnant. Jan 1912: Eric steals money for her; she refuses it. March 1912: Sybil denies her charity appeal. April 1912: she dies.'},
+      {q:"What happens in Act One and why is Birling's speech important?",a:'The Birlings celebrate the engagement. Birling dismisses collective responsibility and predicts no war and the Titanic is unsinkable — both catastrophically wrong to a 1945 audience. The Inspector arrives, questions Birling about sacking Eva, then Sheila about Milwards. The act ends when Gerald reacts to the name Daisy Renton.'},
+      {q:'What is the dramatic significance of the end of Act One?',a:"Sheila's line \"He's giving us rope — so that we'll hang ourselves\" shows she has already understood the Inspector's method. Gerald's visible reaction to \"Daisy Renton\" creates a perfect hook — his secret is about to be exposed. The act closes at maximum dramatic tension."},
+      {q:'What happens in Act Two and what is its most devastating moment?',a:"Gerald confesses to the affair. Sheila returns the ring. Sybil is questioned and coldly admits denying Eva's appeal. The most devastating moment: Sybil passionately insists the father of the child must bear full responsibility — unknowingly condemning her own son Eric. Sheila tries to stop her but Sybil presses on. Eric enters at the end."},
+      {q:'What happens in Act Three and how does the family split?',a:"Eric confesses — the coercion, pregnancy, stolen money, Eva's refusal of it. The Inspector delivers his final speech and leaves. Gerald discovers there is no Inspector Goole. Arthur and Sybil retreat to denial; Sheila and Eric refuse to pretend nothing happened. The telephone rings: a girl has died, a real inspector is coming."},
+      {q:'What is the significance of the cyclical ending?',a:"The telephone call resets the action — the Birlings are about to face the same reckoning again, unprepared and unchanged. For those who refused to learn, nothing is resolved. Priestley's structural warning: the moral lesson cannot be permanently avoided. The final question is whether the audience will choose differently."},
+      {q:'What is the significance of the order of confessions?',a:'Arthur (power/employment) → Sheila (power/social status) → Gerald (power/gender/money) → Eric (power/assault/theft) → Sybil (power/institutional cruelty). Each reveals a different form of class exploitation, building cumulative guilt that is systemic rather than individual.'},
+      {q:"What does Eva's repeated name-changing reveal?",a:'Eva Smith → Daisy Renton → Mrs Birling. She has no fixed identity — only the one her exploiters impose or recognise. It reflects her powerlessness: the working class in 1912 had no stable social identity of their own.'},
+      {q:'How does Priestley use lighting as a dramatic device?',a:'The opening stage directions call for "pink and intimate" lighting — comfortable and flattering. The Inspector demands "a good deal of light". Light becomes a metaphor for moral exposure: the Birlings\' comfortable world is literally replaced by clarity and scrutiny.'},
+      {q:"What are the five key elements of the play's dramatic structure?",a:"1. Real time/unbroken action — creates claustrophobia and inevitability. 2. Interrogation as structure — the Inspector controls the sequence entirely. 3. The chain of responsibility — no single act kills Eva; her death is cumulative. 4. Hook endings to each act — maximum tension at each curtain. 5. Cyclical ending — the lesson must be learned or repeat."},
     ]
   }
 ];
@@ -512,34 +668,57 @@ const AIC = [
 //  STATE
 // ═══════════════════════════════════════════════════════
 let currentCat = 'poems';
+let sidebarOpen = false;
+const catStates = { poems: true, aic: true };
 
 function getTexts(cat){ return cat==='poems'?POEMS:AIC; }
+
+// ═══════════════════════════════════════════════════════
+//  SIDEBAR
+// ═══════════════════════════════════════════════════════
+function toggleSidebar(){
+  sidebarOpen = !sidebarOpen;
+  document.getElementById('sidebar').classList.toggle('open', sidebarOpen);
+  document.getElementById('sidebar-overlay').classList.toggle('show', sidebarOpen);
+}
+function closeSidebar(){
+  sidebarOpen = false;
+  document.getElementById('sidebar').classList.remove('open');
+  document.getElementById('sidebar-overlay').classList.remove('show');
+}
+function toggleCat(cat){
+  catStates[cat] = !catStates[cat];
+  const body = document.getElementById('cat-'+cat);
+  const btn = document.getElementById('toggle-'+cat);
+  body.style.maxHeight = catStates[cat] ? body.scrollHeight+'px' : '0';
+  btn.classList.toggle('collapsed', !catStates[cat]);
+}
 
 // ═══════════════════════════════════════════════════════
 //  NAV
 // ═══════════════════════════════════════════════════════
 function showView(name){
   document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
-  document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
   document.getElementById('view-'+name).classList.add('active');
-  const names=['home','flashcards','context','fill','notes'];
-  document.querySelectorAll('.nav-btn')[names.indexOf(name)]?.classList.add('active');
-  document.getElementById('cat-bar').style.display = name==='home'?'none':'flex';
-  if(name==='home') renderHome();
+  document.querySelectorAll('.sb-item').forEach(b=>b.classList.remove('active'));
+  document.getElementById('sb-home')?.classList.toggle('active', name==='home');
+  window.scrollTo(0,0);
   if(name==='flashcards'){ buildTabs('fc-tabs',currentCat,'initFC'); initFC(0); }
   if(name==='context')   { buildTabs('ctx-tabs',currentCat,'initCtx'); initCtx(0); }
   if(name==='fill')      { buildTabs('fib-tabs',currentCat,'initFib'); initFib(0); }
   if(name==='notes')     { buildTabs('notes-tabs',currentCat,'renderNotes'); renderNotes(0); }
 }
 
-function goMode(view, cat){
-  currentCat = cat;
-  showView(view);
+function navTo(name){
+  showView(name);
+  closeSidebar();
 }
 
-function setCat(cat){
+function navMode(view, cat){
   currentCat = cat;
-  document.querySelectorAll('.cat-btn').forEach(b=>b.classList.toggle('active', b.getAttribute('onclick').includes("'"+cat+"'")));
+  syncCatBtns(view==='flashcards'?'fc':view==='context'?'ctx':view==='fill'?'fib':'notes', cat);
+  showView(view);
+  closeSidebar();
 }
 
 function buildTabs(cid, cat, cbName){
@@ -564,39 +743,7 @@ function syncCatBtns(prefix, cat){
 }
 
 // ═══════════════════════════════════════════════════════
-//  HOME
-// ═══════════════════════════════════════════════════════
-function renderHome(){
-  ['poems','aic'].forEach(cat=>{
-    const texts = getTexts(cat);
-    const id = cat==='poems'?'home-poems':'home-aic';
-    document.getElementById(id).innerHTML = texts.map((t,i)=>`
-      <div class="text-card" onclick="goToText('${cat}',${i})">
-        <h3>${t.title}</h3>
-        <div class="tc-sub">${t.role||t.author+' · '+t.year}</div>
-        <div class="tc-snippet">"${esc(t.snippet)}"</div>
-        <div class="tc-count">${t.quotes&&t.quotes.length?t.quotes.length+' key phrases · ':'<span style="color:var(--gold);font-size:0.7rem">Context only</span> · '}${t.contextQuestions.length} context cards</div>
-      </div>
-    `).join('');
-  });
-}
-
-function goToText(cat, idx){
-  currentCat = cat;
-  const text = getTexts(cat)[idx];
-  const hasQuotes = text.quotes && text.quotes.length > 0;
-  const view = hasQuotes ? 'flashcards' : 'context';
-  const tabsId = hasQuotes ? 'fc-tabs' : 'ctx-tabs';
-  const cbName = hasQuotes ? 'initFC' : 'initCtx';
-  buildTabs(tabsId, cat, cbName);
-  showView(view);
-  if(hasQuotes){ initFC(idx); } else { initCtx(idx); }
-  document.getElementById(tabsId).querySelectorAll('.tab').forEach((b,i)=>b.classList.toggle('active',i===idx));
-  syncCatBtns(hasQuotes?'fc':'ctx', cat);
-}
-
-// ═══════════════════════════════════════════════════════
-//  CATEGORY SWITCHERS (inline cat-bar buttons)
+//  CATEGORY SWITCHERS
 // ═══════════════════════════════════════════════════════
 function fcSetCat(cat){ currentCat=cat; syncCatBtns('fc',cat); buildTabs('fc-tabs',cat,'initFC'); initFC(0); }
 function ctxSetCat(cat){ currentCat=cat; syncCatBtns('ctx',cat); buildTabs('ctx-tabs',cat,'initCtx'); initCtx(0); }
@@ -608,14 +755,12 @@ function notesSetCat(cat){ currentCat=cat; syncCatBtns('notes',cat); buildTabs('
 // ═══════════════════════════════════════════════════════
 let fcCat='poems', fcPoem=0, fcIdx=0, fcQueue=[], fcFlipped=false;
 function initFC(pi){
-  fcCat=currentCat; 
+  fcCat=currentCat;
   const texts=getTexts(fcCat);
-  // find a valid starting index with quotes
   let start=pi!==undefined?pi:fcPoem;
   if(!texts[start]||!texts[start].quotes||!texts[start].quotes.length){
-    // find first text with quotes
     start=texts.findIndex(t=>t.quotes&&t.quotes.length>0);
-    if(start<0){document.getElementById('fc-content').innerHTML='<div style="text-align:center;padding:3rem;color:var(--muted)">No quotes in this category</div>';return;}
+    if(start<0){document.getElementById('fc-content').innerHTML='<div style="text-align:center;padding:3rem;color:var(--muted)">No quotes available</div>';return;}
   }
   fcPoem=start;
   fcQueue=shuffle(texts[fcPoem].quotes.map((q,i)=>({...q,_i:i})));
@@ -686,7 +831,7 @@ function renderCtx(){
         <div class="fc-face fc-back">
           <div class="fc-back-content">
             <div class="fc-label">Question</div>
-            <div class="fc-value" style="color:var(--muted);font-size:0.83rem">${esc(q.q)}</div>
+            <div class="fc-value" style="color:var(--muted);font-size:0.78rem">${esc(q.q)}</div>
             <div class="fc-label">Answer</div>
             <div class="fc-value">${esc(q.a)}</div>
           </div>
@@ -712,7 +857,7 @@ function initFib(pi){
   let start=pi!==undefined?pi:fibPoem;
   if(!texts[start]||!texts[start].quotes||!texts[start].quotes.length){
     start=texts.findIndex(t=>t.quotes&&t.quotes.length>0);
-    if(start<0){document.getElementById('fib-content').innerHTML='<div style="text-align:center;padding:3rem;color:var(--muted)">No quotes in this category</div>';return;}
+    if(start<0){document.getElementById('fib-content').innerHTML='<div style="text-align:center;padding:3rem;color:var(--muted)">No quotes available</div>';return;}
   }
   fibPoem=start;
   fibQueue=shuffle(texts[fibPoem].quotes.map((q,i)=>({...q,_i:i})));
@@ -731,8 +876,8 @@ function renderFib(){
     <div class="prog-track"><div class="prog-fill" style="width:${pct}%"></div></div>
     <div class="counter">${fibIdx+1} / ${fibQueue.length} — ${text.title}</div>
     <div class="card">
-      <div style="display:flex;flex-wrap:wrap;gap:0.4rem;margin-bottom:0.75rem">
-        <span class="badge badge-gold">${esc(text.title)}</span>
+      <div style="display:flex;flex-wrap:wrap;gap:0.35rem;margin-bottom:0.65rem">
+        <span class="badge badge-blue">${esc(text.title)}</span>
         <span class="badge">${esc(q.location)}</span>
       </div>
       <div class="fib-phrase">"${html}"</div>
@@ -742,7 +887,7 @@ function renderFib(){
         <p>${esc(q.analysis)}</p>
       </div>
     </div>
-    <div class="fc-actions" style="margin-top:1rem">
+    <div class="fc-actions" style="margin-top:0.85rem">
       <button class="btn btn-ghost btn-sm" onclick="fibReveal()">Reveal</button>
       <button class="btn btn-ghost btn-sm" onclick="fibNext()">Next →</button>
     </div>`;
@@ -776,9 +921,10 @@ function renderNotes(pi){
   const isAIC=cat==='aic';
   document.getElementById('notes-content').innerHTML=`
     <div class="ctx-box">
-      <h3>${esc(text.title)}${isAIC?` <span style="font-size:0.85rem;font-style:italic;color:var(--muted);font-family:'Karla',sans-serif">— ${esc(text.role)}</span>`:` — ${esc(text.author)} (${esc(text.year)})`}</h3>
+      <h3>${esc(text.title)}${isAIC?` <span style="font-size:0.78rem;font-style:italic;color:var(--muted)">— ${esc(text.role)}</span>`:` — ${esc(text.author)} (${esc(text.year)})`}</h3>
       ${text.context.split('\n\n').map(p=>`<p>${esc(p)}</p>`).join('')}
     </div>
+    ${text.quotes&&text.quotes.length?`
     <div class="section-label">Key Phrases & Analysis</div>
     <div class="notes-list">
       ${text.quotes.map(q=>`
@@ -788,7 +934,7 @@ function renderNotes(pi){
           <div class="n-analysis">${esc(q.analysis)}</div>
         </div>
       `).join('')}
-    </div>`;
+    </div>`:''}`;
 }
 
 // ═══════════════════════════════════════════════════════
@@ -797,7 +943,20 @@ function renderNotes(pi){
 function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
 function shuffle(a){return [...a].sort(()=>Math.random()-0.5);}
 
-renderHome();
+function toggleDark(){
+  const dark=document.body.classList.toggle('dark');
+  document.getElementById('dark-toggle').textContent=dark?'🌙':'☀️';
+  localStorage.setItem('litrev_dark',dark?'1':'0');
+}
+if(localStorage.getItem('litrev_dark')==='1'){
+  document.body.classList.add('dark');
+  document.getElementById('dark-toggle').textContent='🌙';
+}
+
+// init sidebar cat heights
+document.querySelectorAll('.sb-cat-body').forEach(el=>{
+  el.style.maxHeight = el.scrollHeight+'px';
+});
 </script>
 </body>
 </html>
