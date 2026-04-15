@@ -288,6 +288,7 @@ body.dark .home-logomark svg [stroke="#2e7dd1"]{stroke:#4d9de0 !important;}
 .auth-actions{display:flex;gap:0.5rem;flex-wrap:wrap;margin-top:0.8rem;}
 .auth-note{font-size:0.72rem;color:var(--muted);margin-top:0.65rem;line-height:1.45;}
 .auth-error{font-size:0.72rem;color:var(--red);margin-top:0.45rem;min-height:1em;}
+.auth-top-btn{width:auto;min-width:84px;padding:0 10px;font-size:0.75rem;font-weight:600;}
 
 #acct-mini{display:flex;align-items:center;gap:0.45rem;}
 #acct-mini .badge{max-width:170px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
@@ -308,7 +309,7 @@ body.dark .home-logomark svg [stroke="#2e7dd1"]{stroke:#4d9de0 !important;}
   </button>
   <div class="topbar-logo" onclick="showView('home')">Lit<em>Rev</em></div>
   <div class="topbar-spacer"></div>
-  <button class="icon-btn" id="account-toggle" onclick="openAuthModal()" title="Account">??</button>
+  <button class="icon-btn auth-top-btn" id="account-toggle" onclick="onAccountToggle()" title="Sign in">Sign in</button>
   <button class="icon-btn" id="dark-toggle" onclick="toggleDark()" title="Toggle dark mode">☀️</button>
 </div>
 
@@ -1798,7 +1799,17 @@ function todayKey(){
 
 function updateAuthButtons(){
   const btn = document.getElementById('account-toggle');
-  if(btn) btn.textContent = authState.user ? '?' : '??';
+  if(!btn) return;
+  btn.textContent = authState.user ? 'Profile' : 'Sign in';
+  btn.title = authState.user ? 'Open profile' : 'Sign in';
+}
+
+function onAccountToggle(){
+  if(authState.user){
+    navTo('account');
+    return;
+  }
+  openAuthModal('signin');
 }
 
 function renderAccountView(){
@@ -1866,6 +1877,7 @@ async function submitAuth(){
   if(!sb){ err.textContent = 'Supabase not configured yet. Add keys to enable accounts.'; return; }
 
   let res;
+  const isSignup = authState.mode === 'signup';
   if(authState.mode === 'signup'){
     res = await sb.auth.signUp({ email, password });
   } else {
@@ -1873,6 +1885,9 @@ async function submitAuth(){
   }
   if(res.error){ err.textContent = res.error.message; return; }
   err.textContent = '';
+  if(isSignup){
+    alert('Account created. Check your email to verify your account, then sign in.');
+  }
   closeAuthModal();
   await refreshAuthState();
 }
