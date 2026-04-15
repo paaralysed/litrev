@@ -275,7 +275,28 @@ body.dark .home-logomark svg [stroke="#2e7dd1"]{stroke:#4d9de0 !important;}
 .csrev-link{position:absolute;bottom:1.5rem;right:1.5rem;text-align:right;text-decoration:none;}
 .csrev-link img{height:28px;opacity:0.75;transition:opacity 0.15s;}
 .csrev-link:hover img{opacity:1;}
-.csrev-link-sub{font-size:0.68rem;color:var(--muted);margin-top:3px;font-family:'Inter',sans-serif;text-decoration:none;}
+.csrev-link-sub{display:block;font-size:0.68rem;color:var(--muted);margin-top:3px;font-family:'Inter',sans-serif;text-decoration:none;}
+
+.auth-modal{position:fixed;inset:0;background:rgba(6,12,20,0.55);z-index:500;display:none;align-items:center;justify-content:center;padding:1rem;}
+.auth-modal.show{display:flex;}
+.auth-card{width:min(420px,100%);background:var(--bg2);border:1px solid var(--border);border-radius:14px;padding:1.25rem;}
+.auth-title{font-family:'DM Serif Display',serif;font-size:1.45rem;margin-bottom:0.35rem;color:var(--text);}
+.auth-sub{font-size:0.78rem;color:var(--muted);margin-bottom:1rem;}
+.auth-row{display:flex;gap:0.6rem;margin-bottom:0.7rem;}
+.auth-input{width:100%;padding:9px 10px;border:1px solid var(--border2);border-radius:8px;background:var(--bg2);color:var(--text);font-family:'Inter',sans-serif;font-size:0.82rem;}
+.auth-input:focus{outline:none;border-color:var(--blue);}
+.auth-actions{display:flex;gap:0.5rem;flex-wrap:wrap;margin-top:0.8rem;}
+.auth-note{font-size:0.72rem;color:var(--muted);margin-top:0.65rem;line-height:1.45;}
+.auth-error{font-size:0.72rem;color:var(--red);margin-top:0.45rem;min-height:1em;}
+
+#acct-mini{display:flex;align-items:center;gap:0.45rem;}
+#acct-mini .badge{max-width:170px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.account-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:0.75rem;margin:1rem 0 1.1rem;}
+.account-stat{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:0.8rem;}
+.account-stat .k{font-size:0.67rem;color:var(--muted);text-transform:uppercase;letter-spacing:0.07em;}
+.account-stat .v{font-family:'DM Serif Display',serif;color:var(--text);font-size:1.45rem;line-height:1.2;margin-top:0.15rem;}
+.account-form{display:grid;gap:0.7rem;max-width:520px;}
+@media(max-width:620px){.account-grid{grid-template-columns:1fr;}}
 </style>
 </head>
 <body>
@@ -287,6 +308,7 @@ body.dark .home-logomark svg [stroke="#2e7dd1"]{stroke:#4d9de0 !important;}
   </button>
   <div class="topbar-logo" onclick="showView('home')">Lit<em>Rev</em></div>
   <div class="topbar-spacer"></div>
+  <button class="icon-btn" id="account-toggle" onclick="openAuthModal()" title="Account">??</button>
   <button class="icon-btn" id="dark-toggle" onclick="toggleDark()" title="Toggle dark mode">☀️</button>
 </div>
 
@@ -489,6 +511,35 @@ body.dark .home-logomark svg [stroke="#2e7dd1"]{stroke:#4d9de0 !important;}
     <div id="notes-content"></div>
   </div>
 
+  <!-- ACCOUNT -->
+  <div id="view-account" class="view">
+    <div class="page-header"><h1>Account</h1><p>Sync your revision progress across devices.</p></div>
+    <div id="account-signed-out" class="card">
+      <p style="margin-bottom:0.75rem;color:var(--muted)">Sign in to save progress, streaks, and XP.</p>
+      <button class="btn btn-primary btn-sm" onclick="openAuthModal('signin')">Sign in</button>
+      <button class="btn btn-ghost btn-sm" onclick="openAuthModal('signup')" style="margin-left:0.45rem">Create account</button>
+    </div>
+    <div id="account-signed-in" style="display:none">
+      <div class="card">
+        <div id="acct-mini" style="margin-bottom:0.9rem"></div>
+        <div class="account-grid">
+          <div class="account-stat"><div class="k">Experience</div><div class="v" id="acct-xp">0</div></div>
+          <div class="account-stat"><div class="k">Streak</div><div class="v" id="acct-streak">0</div></div>
+          <div class="account-stat"><div class="k">Sessions</div><div class="v" id="acct-sessions">0</div></div>
+        </div>
+        <div class="account-form">
+          <input id="profile-name" class="auth-input" placeholder="Display name">
+          <input id="profile-avatar" class="auth-input" placeholder="Avatar URL (optional)">
+          <div>
+            <button class="btn btn-primary btn-sm" onclick="saveProfile()">Save profile</button>
+            <button class="btn btn-ghost btn-sm" onclick="signOutUser()" style="margin-left:0.45rem">Sign out</button>
+          </div>
+          <div id="profile-msg" class="auth-note"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <!-- PAST PAPERS -->
   <div id="view-papers" class="view">
     <div class="page-header">
@@ -667,8 +718,39 @@ body.dark .home-logomark svg [stroke="#2e7dd1"]{stroke:#4d9de0 !important;}
     </div>
   </div>
 
+<div id="auth-modal" class="auth-modal" onclick="if(event.target.id==='auth-modal')closeAuthModal()">
+  <div class="auth-card">
+    <div class="auth-title" id="auth-title">Sign in</div>
+    <div class="auth-sub" id="auth-sub">Save your progress across devices.</div>
+    <div class="auth-row">
+      <input id="auth-email" class="auth-input" type="email" placeholder="Email" autocomplete="email">
+    </div>
+    <div class="auth-row">
+      <input id="auth-password" class="auth-input" type="password" placeholder="Password" autocomplete="current-password">
+    </div>
+    <div class="auth-actions">
+      <button class="btn btn-primary btn-sm" id="auth-submit" onclick="submitAuth()">Sign in</button>
+      <button class="btn btn-ghost btn-sm" onclick="switchAuthMode()" id="auth-switch">Need an account?</button>
+      <button class="btn btn-ghost btn-sm" onclick="resetPassword()">Reset password</button>
+    </div>
+    <div id="auth-error" class="auth-error"></div>
+    <div class="auth-note">If Supabase is not configured yet, LitRev keeps local progress only.</div>
+  </div>
+</div>
+
 </div><!-- /main -->
 
+<script>
+  // Vercel/runtime env injection block.
+  // Replace these placeholders during deploy, or set window vars earlier.
+  window.__LITREV_SUPABASE_URL =
+    window.__LITREV_SUPABASE_URL ||
+    "__LITREV_SUPABASE_URL__";
+  window.__LITREV_SUPABASE_ANON_KEY =
+    window.__LITREV_SUPABASE_ANON_KEY ||
+    "__LITREV_SUPABASE_ANON_KEY__";
+</script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
 // ═══════════════════════════════════════════════════════
 //  DATA — POEMS
@@ -1656,7 +1738,304 @@ let currentCat = 'poems';
 let sidebarOpen = false;
 const catStates = { poems: true, aic: true, acc: true, raj: true };
 
+const SUPABASE_URL = (window.LITREV_SUPABASE_URL || window.__LITREV_SUPABASE_URL || '').replace(/^__.*__$/, '');
+const SUPABASE_ANON_KEY = (window.LITREV_SUPABASE_ANON_KEY || window.__LITREV_SUPABASE_ANON_KEY || '').replace(/^__.*__$/, '');
+const sb = (window.supabase && SUPABASE_URL && SUPABASE_ANON_KEY) ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
+
+const authState = {
+  mode: 'signin',
+  user: null,
+  profile: null,
+  stats: { xp_total: 0, streak_days: 0, sessions_completed: 0 },
+  progress: {},
+  localOnly: !sb
+};
+
 function getTexts(cat){ return cat==='poems'?POEMS:cat==='aic'?AIC:cat==='acc'?ACC:RAJ; }
+
+function getProgressKey(mode, category, textId, itemId){
+  return `${mode}::${category}::${textId}::${itemId}`;
+}
+
+function getItemId(mode, item){
+  return mode==='context' ? (item.q || '') : (item.phrase || '');
+}
+
+function loadLocalProgress(){
+  try {
+    const raw = localStorage.getItem('litrev_progress_v1');
+    if(!raw) return {};
+    const parsed = JSON.parse(raw);
+    return parsed && typeof parsed==='object' ? parsed : {};
+  } catch {
+    return {};
+  }
+}
+
+function saveLocalProgress(data){
+  localStorage.setItem('litrev_progress_v1', JSON.stringify(data || {}));
+}
+
+function getProgressScore(mode, category, textId, itemId){
+  const key = getProgressKey(mode, category, textId, itemId);
+  const pRow = authState.progress[key];
+  if(!pRow) return 0;
+  return (pRow.remembered_count || 0) - (pRow.forgot_count || 0);
+}
+
+function prioritizeQueue(mode, category, textId, queue){
+  return [...queue].sort((a,b)=>{
+    const sa = getProgressScore(mode, category, textId, getItemId(mode, a));
+    const sb2 = getProgressScore(mode, category, textId, getItemId(mode, b));
+    if(sa!==sb2) return sa - sb2;
+    return Math.random()-0.5;
+  });
+}
+
+function todayKey(){
+  return new Date().toISOString().slice(0,10);
+}
+
+function updateAuthButtons(){
+  const btn = document.getElementById('account-toggle');
+  if(btn) btn.textContent = authState.user ? '?' : '??';
+}
+
+function renderAccountView(){
+  const out = document.getElementById('account-signed-out');
+  const sin = document.getElementById('account-signed-in');
+  const mini = document.getElementById('acct-mini');
+  if(!out || !sin || !mini) return;
+
+  if(!authState.user){
+    out.style.display='block';
+    sin.style.display='none';
+    updateAuthButtons();
+    return;
+  }
+
+  out.style.display='none';
+  sin.style.display='block';
+  updateAuthButtons();
+
+  const em = authState.user.email || 'Signed in';
+  const dn = (authState.profile && authState.profile.display_name) || em;
+  const av = (authState.profile && authState.profile.avatar_url) || '';
+  mini.innerHTML = `${av ? `<img src="${esc(av)}" alt="avatar" style="width:26px;height:26px;border-radius:50%;object-fit:cover">` : ''}<span class="badge badge-blue">${esc(dn)}</span><span class="badge">${esc(em)}</span>`;
+
+  document.getElementById('acct-xp').textContent = String(authState.stats.xp_total || 0);
+  document.getElementById('acct-streak').textContent = String(authState.stats.streak_days || 0) + 'd';
+  document.getElementById('acct-sessions').textContent = String(authState.stats.sessions_completed || 0);
+  document.getElementById('profile-name').value = (authState.profile && authState.profile.display_name) || '';
+  document.getElementById('profile-avatar').value = (authState.profile && authState.profile.avatar_url) || '';
+}
+
+function setAuthMode(mode){
+  authState.mode = mode === 'signup' ? 'signup' : 'signin';
+  const title = document.getElementById('auth-title');
+  const sub = document.getElementById('auth-sub');
+  const submit = document.getElementById('auth-submit');
+  const sw = document.getElementById('auth-switch');
+  if(title) title.textContent = authState.mode === 'signup' ? 'Create account' : 'Sign in';
+  if(sub) sub.textContent = authState.mode === 'signup' ? 'Create a LitRev account to sync progress.' : 'Save your progress across devices.';
+  if(submit) submit.textContent = authState.mode === 'signup' ? 'Create account' : 'Sign in';
+  if(sw) sw.textContent = authState.mode === 'signup' ? 'Already have an account?' : 'Need an account?';
+}
+
+function switchAuthMode(){
+  setAuthMode(authState.mode === 'signup' ? 'signin' : 'signup');
+}
+
+function openAuthModal(mode){
+  if(mode) setAuthMode(mode);
+  const m = document.getElementById('auth-modal');
+  if(m) m.classList.add('show');
+  document.getElementById('auth-error').textContent = '';
+}
+
+function closeAuthModal(){
+  const m = document.getElementById('auth-modal');
+  if(m) m.classList.remove('show');
+}
+
+async function submitAuth(){
+  const err = document.getElementById('auth-error');
+  const email = (document.getElementById('auth-email').value || '').trim();
+  const password = document.getElementById('auth-password').value || '';
+  if(!email || !password){ err.textContent = 'Enter email and password.'; return; }
+  if(!sb){ err.textContent = 'Supabase not configured yet. Add keys to enable accounts.'; return; }
+
+  let res;
+  if(authState.mode === 'signup'){
+    res = await sb.auth.signUp({ email, password });
+  } else {
+    res = await sb.auth.signInWithPassword({ email, password });
+  }
+  if(res.error){ err.textContent = res.error.message; return; }
+  err.textContent = '';
+  closeAuthModal();
+  await refreshAuthState();
+}
+
+async function resetPassword(){
+  const err = document.getElementById('auth-error');
+  const email = (document.getElementById('auth-email').value || '').trim();
+  if(!email){ err.textContent = 'Enter your email first.'; return; }
+  if(!sb){ err.textContent = 'Supabase not configured yet.'; return; }
+  const { error } = await sb.auth.resetPasswordForEmail(email);
+  err.textContent = error ? error.message : 'Password reset email sent.';
+}
+
+async function signOutUser(){
+  if(sb) await sb.auth.signOut();
+  authState.user = null;
+  authState.profile = null;
+  authState.stats = { xp_total: 0, streak_days: 0, sessions_completed: 0 };
+  authState.progress = loadLocalProgress();
+  renderAccountView();
+}
+
+async function saveProfile(){
+  const msg = document.getElementById('profile-msg');
+  if(!authState.user){ msg.textContent = 'Sign in first.'; return; }
+  const display_name = (document.getElementById('profile-name').value || '').trim();
+  const avatar_url = (document.getElementById('profile-avatar').value || '').trim();
+
+  if(!sb){
+    authState.profile = { display_name, avatar_url };
+    msg.textContent = 'Saved locally (Supabase not configured).';
+    renderAccountView();
+    return;
+  }
+
+  const { error } = await sb.from('profiles').upsert({ user_id: authState.user.id, display_name, avatar_url }, { onConflict: 'user_id' });
+  msg.textContent = error ? error.message : 'Profile saved.';
+  if(!error) await loadUserData();
+}
+
+async function upsertProgressRow(row){
+  if(!row) return;
+  const key = getProgressKey(row.mode, row.category, row.text_id, row.item_id);
+  const existing = authState.progress[key] || { remembered_count: 0, forgot_count: 0 };
+  const remembered_count = Math.max(existing.remembered_count || 0, row.remembered_count || 0);
+  const forgot_count = Math.max(existing.forgot_count || 0, row.forgot_count || 0);
+  const merged = { ...row, remembered_count, forgot_count, last_seen_at: new Date().toISOString() };
+  authState.progress[key] = merged;
+
+  if(authState.user && sb){
+    await sb.from('user_progress').upsert({ ...merged, user_id: authState.user.id }, { onConflict: 'user_id,mode,category,text_id,item_id' });
+  } else {
+    saveLocalProgress(authState.progress);
+  }
+}
+
+async function loadUserData(){
+  if(!authState.user) return;
+
+  if(!sb){
+    authState.progress = loadLocalProgress();
+    const localStats = JSON.parse(localStorage.getItem('litrev_local_stats') || '{"xp_total":0,"streak_days":0,"sessions_completed":0}');
+    authState.stats = localStats;
+    renderAccountView();
+    return;
+  }
+
+  const uid = authState.user.id;
+  const [pRes, sRes, progRes] = await Promise.all([
+    sb.from('profiles').select('display_name,avatar_url').eq('user_id', uid).maybeSingle(),
+    sb.from('user_stats').select('xp_total,streak_days,sessions_completed,last_session_date').eq('user_id', uid).maybeSingle(),
+    sb.from('user_progress').select('mode,category,text_id,item_id,remembered_count,forgot_count,last_seen_at').eq('user_id', uid).limit(5000)
+  ]);
+
+  authState.profile = pRes.data || null;
+  authState.stats = sRes.data || { xp_total: 0, streak_days: 0, sessions_completed: 0, last_session_date: null };
+
+  const map = {};
+  (progRes.data || []).forEach(row=>{ map[getProgressKey(row.mode, row.category, row.text_id, row.item_id)] = row; });
+  authState.progress = map;
+
+  const local = loadLocalProgress();
+  if(Object.keys(local).length){
+    for(const row of Object.values(local)){
+      await upsertProgressRow(row);
+    }
+    saveLocalProgress({});
+  }
+
+  renderAccountView();
+}
+
+async function refreshAuthState(){
+  if(!sb){
+    authState.user = null;
+    authState.progress = loadLocalProgress();
+    const localStats = JSON.parse(localStorage.getItem('litrev_local_stats') || '{"xp_total":0,"streak_days":0,"sessions_completed":0}');
+    authState.stats = localStats;
+    renderAccountView();
+    return;
+  }
+
+  const { data } = await sb.auth.getUser();
+  authState.user = data.user || null;
+  if(authState.user){
+    await loadUserData();
+  } else {
+    authState.profile = null;
+    authState.stats = { xp_total: 0, streak_days: 0, sessions_completed: 0 };
+    authState.progress = loadLocalProgress();
+    renderAccountView();
+  }
+}
+
+async function logSessionCompletion(mode, category, textId, totalSeen, forgotCount, queue){
+  if(totalSeen<=0) return;
+  const remembered = Math.max(totalSeen - forgotCount, 0);
+  const rows = (queue || []).map(item=>({
+    mode,
+    category,
+    text_id: textId,
+    item_id: getItemId(mode, item),
+    remembered_count: remembered,
+    forgot_count: forgotCount
+  }));
+
+  for(const row of rows){
+    await upsertProgressRow(row);
+  }
+
+  if(authState.user && sb){
+    const today = todayKey();
+    const prev = authState.stats || { xp_total: 0, streak_days: 0, sessions_completed: 0 };
+    const last = prev.last_session_date || null;
+    let streak = Number(prev.streak_days || 0);
+    if(last === today){
+      streak = Number(prev.streak_days || 0);
+    } else {
+      const yd = new Date(Date.now() - 86400000).toISOString().slice(0,10);
+      streak = (last === yd) ? streak + 1 : 1;
+    }
+    const xp_gain = remembered * 10;
+    const nextStats = {
+      user_id: authState.user.id,
+      xp_total: Number(prev.xp_total || 0) + xp_gain,
+      streak_days: streak,
+      sessions_completed: Number(prev.sessions_completed || 0) + 1,
+      last_session_date: today,
+      updated_at: new Date().toISOString()
+    };
+    await sb.from('user_stats').upsert(nextStats, { onConflict: 'user_id' });
+    authState.stats = nextStats;
+  } else {
+    const localStats = JSON.parse(localStorage.getItem('litrev_local_stats') || '{"xp_total":0,"streak_days":0,"sessions_completed":0}');
+    localStats.xp_total = Number(localStats.xp_total || 0) + remembered * 10;
+    localStats.sessions_completed = Number(localStats.sessions_completed || 0) + 1;
+    localStorage.setItem('litrev_local_stats', JSON.stringify(localStats));
+    authState.stats = localStats;
+  }
+
+  renderAccountView();
+}
+
 
 // ═══════════════════════════════════════════════════════
 //  SIDEBAR
@@ -1688,6 +2067,7 @@ function showView(name){
   document.querySelectorAll('.sb-item').forEach(b=>b.classList.remove('active'));
   document.getElementById('sb-home')?.classList.toggle('active', name==='home');
   document.getElementById('sb-papers')?.classList.toggle('active', name==='papers');
+  document.getElementById('sb-account')?.classList.toggle('active', name==='account');
   window.scrollTo(0,0);
   if(name==='flashcards'){ buildTabs('fc-tabs',currentCat,'initFC'); initFC(0); }
   if(name==='context')   { buildTabs('ctx-tabs',currentCat,'initCtx'); initCtx(0); }
@@ -1794,7 +2174,7 @@ function fibDoneHTML(totalSeen, forgotCount){
 // ═══════════════════════════════════════════════════════
 //  FLASHCARDS
 // ═══════════════════════════════════════════════════════
-let fcCat='poems', fcPoem=0, fcIdx=0, fcQueue=[], fcFlipped=false, fcTotal=0, fcForgot=0;
+let fcCat='poems', fcPoem=0, fcIdx=0, fcQueue=[], fcFlipped=false, fcTotal=0, fcForgot=0, fcSaved=false;
 function initFC(pi){
   fcCat=currentCat;
   const texts=getTexts(fcCat);
@@ -1804,13 +2184,20 @@ function initFC(pi){
     if(start<0){document.getElementById('fc-content').innerHTML='<div style="text-align:center;padding:3rem;color:var(--muted)">No quotes available</div>';return;}
   }
   fcPoem=start;
-  fcQueue=shuffle(texts[fcPoem].quotes.map((q,i)=>({...q,_i:i,_forgot:0})));
+  fcQueue=prioritizeQueue('flashcards', fcCat, texts[fcPoem].title, texts[fcPoem].quotes.map((q,i)=>({...q,_i:i,_forgot:0})));
   fcTotal=fcQueue.length; fcForgot=0;
-  fcIdx=0; fcFlipped=false; renderFC();
+  fcIdx=0; fcFlipped=false; fcSaved=false; renderFC();
 }
 function renderFC(){
   const el=document.getElementById('fc-content');
-  if(!fcQueue.length){el.innerHTML=sessionDoneHTML(fcTotal,fcForgot);return;}
+  if(!fcQueue.length){
+    if(!fcSaved){
+      fcSaved = true;
+      logSessionCompletion('flashcards', fcCat, getTexts(fcCat)[fcPoem].title, fcTotal, fcForgot, getTexts(fcCat)[fcPoem].quotes);
+    }
+    el.innerHTML=sessionDoneHTML(fcTotal,fcForgot);
+    return;
+  }
   const text=getTexts(fcCat)[fcPoem];
   const q=fcQueue[fcIdx];
   const remaining=fcQueue.length;
@@ -1861,16 +2248,23 @@ function fcAnswer(known){
 // ═══════════════════════════════════════════════════════
 //  CONTEXT CARDS
 // ═══════════════════════════════════════════════════════
-let ctxCat='poems', ctxPoem=0, ctxIdx=0, ctxQueue=[], ctxFlipped=false, ctxTotal=0, ctxForgot=0;
+let ctxCat='poems', ctxPoem=0, ctxIdx=0, ctxQueue=[], ctxFlipped=false, ctxTotal=0, ctxForgot=0, ctxSaved=false;
 function initCtx(pi){
   ctxCat=currentCat; ctxPoem=pi!==undefined?pi:ctxPoem;
-  ctxQueue=shuffle(getTexts(ctxCat)[ctxPoem].contextQuestions.map((q,i)=>({...q,_i:i,_forgot:0})));
+  ctxQueue=prioritizeQueue('context', ctxCat, getTexts(ctxCat)[ctxPoem].title, getTexts(ctxCat)[ctxPoem].contextQuestions.map((q,i)=>({...q,_i:i,_forgot:0})));
   ctxTotal=ctxQueue.length; ctxForgot=0;
-  ctxIdx=0; ctxFlipped=false; renderCtx();
+  ctxIdx=0; ctxFlipped=false; ctxSaved=false; renderCtx();
 }
 function renderCtx(){
   const el=document.getElementById('ctx-content');
-  if(!ctxQueue.length){el.innerHTML=ctxDoneHTML(ctxTotal,ctxForgot);return;}
+  if(!ctxQueue.length){
+    if(!ctxSaved){
+      ctxSaved = true;
+      logSessionCompletion('context', ctxCat, getTexts(ctxCat)[ctxPoem].title, ctxTotal, ctxForgot, getTexts(ctxCat)[ctxPoem].contextQuestions);
+    }
+    el.innerHTML=ctxDoneHTML(ctxTotal,ctxForgot);
+    return;
+  }
   const text=getTexts(ctxCat)[ctxPoem];
   const q=ctxQueue[ctxIdx];
   const remaining=ctxQueue.length;
@@ -1920,7 +2314,7 @@ function ctxAnswer(known){
 // ═══════════════════════════════════════════════════════
 //  FILL IN BLANK
 // ═══════════════════════════════════════════════════════
-let fibCat='poems', fibPoem=0, fibIdx=0, fibQueue=[], fibTotal=0, fibForgot=0;
+let fibCat='poems', fibPoem=0, fibIdx=0, fibQueue=[], fibTotal=0, fibForgot=0, fibSaved=false;
 function initFib(pi){
   fibCat=currentCat;
   const texts=getTexts(fibCat);
@@ -1930,13 +2324,20 @@ function initFib(pi){
     if(start<0){document.getElementById('fib-content').innerHTML='<div style="text-align:center;padding:3rem;color:var(--muted)">No quotes available</div>';return;}
   }
   fibPoem=start;
-  fibQueue=shuffle(texts[fibPoem].quotes.map((q,i)=>({...q,_i:i,_forgot:0})));
+  fibQueue=prioritizeQueue('fill', fibCat, texts[fibPoem].title, texts[fibPoem].quotes.map((q,i)=>({...q,_i:i,_forgot:0})));
   fibTotal=fibQueue.length; fibForgot=0;
-  fibIdx=0; renderFib();
+  fibIdx=0; fibSaved=false; renderFib();
 }
 function renderFib(){
   const el=document.getElementById('fib-content');
-  if(!fibQueue.length){el.innerHTML=fibDoneHTML(fibTotal,fibForgot);return;}
+  if(!fibQueue.length){
+    if(!fibSaved){
+      fibSaved = true;
+      logSessionCompletion('fill', fibCat, getTexts(fibCat)[fibPoem].title, fibTotal, fibForgot, getTexts(fibCat)[fibPoem].quotes);
+    }
+    el.innerHTML=fibDoneHTML(fibTotal,fibForgot);
+    return;
+  }
   const text=getTexts(fibCat)[fibPoem];
   const q=fibQueue[fibIdx];
   const remaining=fibQueue.length;
@@ -2052,6 +2453,14 @@ if(localStorage.getItem('litrev_dark')==='1'){
 document.querySelectorAll('.sb-cat-body').forEach(el=>{
   el.style.maxHeight = el.scrollHeight+'px';
 });
+
+setAuthMode('signin');
+refreshAuthState();
+if(sb){
+  sb.auth.onAuthStateChange(async ()=>{
+    await refreshAuthState();
+  });
+}
 </script>
 </body>
 </html>
